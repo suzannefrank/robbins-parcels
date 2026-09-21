@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Robbins Property Holdings — Parcel Map | Fayette County, PA</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: #f4f6f8; color: #1c2330; }
+  @media (prefers-color-scheme: dark) { body { background: #12161d; color: #e8ecf1; } }
+  header { background: linear-gradient(135deg, #1e4d7b, #2e7d4f); color: #fff; padding: 28px 24px; }
+  header h1 { margin: 0 0 6px; font-size: 24px; }
+  header p { margin: 0; opacity: .92; font-size: 14px; }
+  main { max-width: 1080px; margin: 0 auto; padding: 20px 16px 40px; }
+  #map { width: 100%; height: 520px; border-radius: 12px; border: 1px solid #d4dbe3; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+  @media (prefers-color-scheme: dark) { #map { border-color: #2c3440; } }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 14px 0 6px; font-size: 13px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  h2 { margin-top: 28px; font-size: 18px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .card { background: #fff; border: 1px solid #dfe5ec; border-radius: 10px; padding: 14px 16px; }
+  @media (prefers-color-scheme: dark) { .card { background: #1b212b; border-color: #2c3440; } }
+  .card h3 { margin: 0 0 6px; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  .card p { margin: 4px 0; font-size: 13px; line-height: 1.5; }
+  .card .meta { color: #5b6675; font-size: 12px; }
+  @media (prefers-color-scheme: dark) { .card .meta { color: #9aa4b2; } }
+  .disclaimer { margin-top: 28px; padding: 14px 16px; border-left: 4px solid #d9a400; background: #fff8e6; border-radius: 0 10px 10px 0; font-size: 13px; line-height: 1.6; }
+  @media (prefers-color-scheme: dark) { .disclaimer { background: #2a2410; } }
+  footer { margin-top: 20px; font-size: 12px; color: #5b6675; line-height: 1.6; }
+  @media (prefers-color-scheme: dark) { footer { color: #9aa4b2; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Robbins Property Holdings</h1>
+  <p>Seven parcels · Washington &amp; Jefferson Townships, Fayette County, PA · Owner: Robbins Richard L II</p>
+</header>
+<main>
+  <div id="map"></div>
+  <div class="legend">
+    <span><i class="swatch" style="background:#3388ff"></i>190 Hamer Rd · 10.54 ac (2 parts)</span>
+    <span><i class="swatch" style="background:#33a852"></i>Farm · 22.26 ac (2 parts)</span>
+    <span><i class="swatch" style="background:#e6b800"></i>221 Hamer Rd · 0.778 ac</span>
+    <span><i class="swatch" style="background:#e6b800;opacity:.55"></i>House lot · 0.25 ac</span>
+    <span><i class="swatch" style="background:#9b59b6"></i>41-23-0002 · 30.16 ac</span>
+    <span><i class="swatch" style="background:#16a085"></i>41-19-0029-01 · 72.98 ac</span>
+    <span><i class="swatch" style="background:#ff6b35"></i>17-05-0002 · 17 ac</span>
+  </div>
+  <p style="font-size:13px;color:#5b6675">Tap any parcel on the map for details. Two distinct groups: the Hamer Rd cluster (north, near Fayette City) and the Perryopolis Rd block (south, ~1.1 mi away). The groups do not touch.</p>
+
+  <h2>Hamer Rd cluster</h2>
+  <div class="cards">
+    <div class="card"><h3><i class="swatch" style="background:#3388ff"></i>41-10-0016-04</h3><p><b>190 Hamer Rd</b> · 10.54 acres</p><p class="meta">Two parts: northwest wedge + west-center crescent. Washington Twp, Belle Vernon Area SD.</p></div>
+    <div class="card"><h3><i class="swatch" style="background:#33a852"></i>41-10-0016-03</h3><p><b>Farm</b> · 22.26 acres</p><p class="meta">Two parts: large southern farm + smaller northern piece. Wraps around the 190 Hamer pieces. Washington Twp, Belle Vernon Area SD.</p></div>
+    <div class="card"><h3><i class="swatch" style="background:#e6b800"></i>41-10-0017</h3><p><b>221 Hamer Rd</b> · 0.778 acre</p><p class="meta">Vacant residential lot fronting Hamer Rd. Washington Twp, Belle Vernon Area SD.</p></div>
+    <div class="card"><h3><i class="swatch" style="background:#e6b800;opacity:.55"></i>41-10-0017-01</h3><p><b>Hamer Rd house lot</b> · 0.25 acre</p><p class="meta">Bungalow built 1960, ~960 sq ft. Adjoins 41-10-0017. Washington Twp, Belle Vernon Area SD.</p></div>
+  </div>
+
+  <h2>Perryopolis Rd block (~120 contiguous acres)</h2>
+  <div class="cards">
+    <div class="card"><h3><i class="swatch" style="background:#9b59b6"></i>41-23-0002</h3><p><b>Near Perryopolis Rd (Gillespie)</b> · 30.16 acres</p><p class="meta">Middle piece — shares a full boundary with each neighbor. Washington Twp, Belle Vernon Area SD.</p></div>
+    <div class="card"><h3><i class="swatch" style="background:#16a085"></i>41-19-0029-01</h3><p><b>Redstone Church Rd</b> · 72.98 acres</p><p class="meta">Farm with 2-story brick residence (1806, 1,760 sq ft). West piece of the block. Washington Twp, Belle Vernon Area SD.</p></div>
+    <div class="card"><h3><i class="swatch" style="background:#ff6b35"></i>17-05-0002</h3><p><b>Near Perryopolis (TR474)</b> · 17 acres</p><p class="meta">Farm, landlocked, no utilities, Clean &amp; Green (ACT319). East piece of the block. Jefferson Twp, Frazier Area SD.</p></div>
+  </div>
+
+  <div class="disclaimer">
+    <b>Important:</b> This map is a schematic illustration for marketing and discussion purposes only. Parcel boundaries are drawn from the PASDA February-2026 republication of Fayette County parcel geometry and have not been field-verified. <b>This is not a survey and not a legal boundary map.</b> Verify all boundaries, acreage, and title with the Fayette County Assessment Office and a licensed surveyor before any transaction.
+  </div>
+
+  <footer>
+    Sources: Fayette County PA assessment records (property.fayettepa.org, last updated 3/17/2026); parcel geometry via PASDA Fayette County Parcels MapServer, region 202602 (Feb 2026 vintage, provided as-is). Ownership shown is assessed owner per county records; confirm recorded title via deed search. Prepared September 2026.
+  </footer>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function(){
+var map = L.map('map');
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '© OpenStreetMap contributors'}).addTo(map);
+var all = [];
+function addPoly(coords, color, popup){
+  var p = L.polygon(coords, {color: color, weight: 2, fillColor: color, fillOpacity: 0.35}).addTo(map).bindPopup(popup);
+  all.push(p);
+}
+addPoly([[40.1004178,-79.8142405],[40.1019261,-79.8126227],[40.1022364,-79.8129640],[40.1025458,-79.8126086],[40.1028097,-79.8124309],[40.1028664,-79.8124689],[40.1030833,-79.8119041],[40.1027356,-79.8122781],[40.1018638,-79.8116263],[40.1009124,-79.8108930],[40.0981143,-79.8126287],[40.0992670,-79.8146988],[40.0996519,-79.8135183]], '#1e7a34', '<b>41-10-0016-03</b> · Farm · 22.26 ac<br>Southern farm part');
+addPoly([[40.1031265,-79.8119383],[40.1029114,-79.8125010],[40.1037685,-79.8131711],[40.1043496,-79.8117766],[40.1034443,-79.8111139],[40.1034020,-79.8112137],[40.1036463,-79.8113750],[40.1039857,-79.8115996],[40.1037070,-79.8123219]], '#1e7a34', '<b>41-10-0016-03</b> · Farm · 22.26 ac<br>Northern part');
+addPoly([[40.1029114,-79.8125010],[40.1026793,-79.8132093],[40.1026113,-79.8133743],[40.1025158,-79.8135285],[40.1022108,-79.8138731],[40.1017978,-79.8143188],[40.1029566,-79.8151519],[40.1037685,-79.8131711]], '#1a6fd4', '<b>41-10-0016-04</b> · 190 Hamer Rd · 10.54 ac<br>Northwest wedge');
+addPoly([[40.1022364,-79.8129640],[40.1019261,-79.8126227],[40.1004178,-79.8142405],[40.1007017,-79.8145964],[40.1010785,-79.8143397],[40.1013518,-79.8147184],[40.1017596,-79.8142824],[40.1021788,-79.8138249],[40.1024727,-79.8134844],[40.1025604,-79.8133431],[40.1026341,-79.8131849],[40.1028664,-79.8124689],[40.1028097,-79.8124309],[40.1025458,-79.8126086]], '#1a6fd4', '<b>41-10-0016-04</b> · 190 Hamer Rd · 10.54 ac<br>West-center crescent');
+addPoly([[40.1032611,-79.8115853],[40.1031265,-79.8119383],[40.1037070,-79.8123219],[40.1039857,-79.8115996],[40.1036463,-79.8113750],[40.1034957,-79.8117276]], '#b39000', '<b>41-10-0017</b> · 221 Hamer Rd · 0.778 ac');
+addPoly([[40.1032611,-79.8115853],[40.1034957,-79.8117276],[40.1036463,-79.8113750],[40.1034020,-79.8112137]], '#b39000', '<b>41-10-0017-01</b> · House lot · 0.25 ac');
+addPoly([[40.089258,-79.802777],[40.087475,-79.798523],[40.090755,-79.796728],[40.091786,-79.798755]], '#7d3c98', '<b>41-23-0002</b> · 30.16 ac<br>Middle piece');
+addPoly([[40.095899,-79.80347],[40.094286,-79.803784],[40.09412,-79.803797],[40.093939,-79.803758],[40.093762,-79.80365],[40.093634,-79.803524],[40.093296,-79.803138],[40.093161,-79.803039],[40.09299,-79.80302],[40.092815,-79.803079],[40.092659,-79.803202],[40.092459,-79.80345],[40.092156,-79.803833],[40.091949,-79.803987],[40.091826,-79.804053],[40.091666,-79.804105],[40.090701,-79.804408],[40.090519,-79.804483],[40.090208,-79.804718],[40.088919,-79.803316],[40.089258,-79.802777],[40.091786,-79.798755],[40.093701,-79.795687],[40.093887,-79.795383]], '#0e7c61', '<b>41-19-0029-01</b> · Redstone Church Rd · 72.98 ac');
+addPoly([[40.087475,-79.798523],[40.086975,-79.797246],[40.088126,-79.795589],[40.087605,-79.794811],[40.089255,-79.793711],[40.090755,-79.796728]], '#c44e12', '<b>17-05-0002</b> · 17 ac · Jefferson Twp');
+var bounds = L.latLngBounds([]);
+all.forEach(function(p){ bounds.extend(p.getBounds()); });
+map.fitBounds(bounds.pad(0.15));
+L.control.scale().addTo(map);
+})();
+</script>
+</body>
+</html>
