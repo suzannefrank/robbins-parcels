@@ -96,6 +96,30 @@ section{padding:72px 0}
 .panel dl{margin:18px 0 0;font-size:13.5px}
 .panel dt{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:12px}
 .panel dd{margin:3px 0 0;color:var(--cream)}
+/* feature layers */
+.lyrchips{position:absolute;top:14px;left:14px;z-index:500;display:flex;gap:8px;flex-wrap:wrap;max-width:60%}
+.lyrchip{background:rgba(12,16,14,.88);border:1px solid var(--line);color:var(--muted);font-size:12px;font-weight:600;
+  padding:8px 13px;border-radius:999px;cursor:pointer;backdrop-filter:blur(8px);display:flex;align-items:center;gap:7px}
+.lyrchip .sw{width:10px;height:10px;border-radius:50%;flex:none}
+.lyrchip.off{opacity:.45}
+.lyrchip.off .sw{background:#555 !important}
+.map-legend{position:absolute;left:14px;bottom:26px;z-index:500;background:rgba(12,16,14,.88);border:1px solid var(--line);
+  border-radius:12px;padding:10px 13px;font-size:11.5px;color:var(--muted);backdrop-filter:blur(8px);max-width:250px;line-height:1.7}
+.map-legend b{color:var(--cream);font-weight:700}
+.map-legend .li{display:flex;align-items:center;gap:8px}
+.map-legend .sw{width:10px;height:10px;border-radius:50%;flex:none}
+.map-legend .ln{width:18px;height:3px;border-radius:2px;flex:none}
+.struct-tip{background:rgba(12,16,14,.92) !important;border:1px solid var(--gold) !important;color:var(--cream) !important;
+  font-size:12px !important;border-radius:8px !important;padding:6px 10px !important}
+.struct-tip:before{display:none !important}
+.conf{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:1px}
+.conf.high{background:rgba(95,208,138,.16);color:#5fd08a;border:1px solid rgba(95,208,138,.4)}
+.conf.medium{background:rgba(255,210,63,.14);color:#ffd23f;border:1px solid rgba(255,210,63,.4)}
+.conf.low{background:rgba(255,107,107,.14);color:#ff6b6b;border:1px solid rgba(255,107,107,.4)}
+.src{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+.p-note{background:rgba(226,169,62,.1);border:1px solid rgba(226,169,62,.35);border-radius:10px;
+  padding:10px 12px;margin-top:14px;font-size:12.5px;color:var(--cream)}
 .panel .close{position:absolute;top:14px;right:14px;background:none;border:1px solid var(--line);color:var(--muted);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:16px;line-height:1}
 .panel .close:hover{color:var(--cream);border-color:var(--gold)}
 /* parcel cards */
@@ -161,7 +185,7 @@ footer{border-top:1px solid var(--line);padding:34px 0 44px;font-size:12.5px;col
       <div class="stat"><div class="num"><span data-count="153.97" data-dec="2">0</span></div><div class="lbl">Total acres</div></div>
       <div class="stat"><div class="num"><span data-count="7">0</span></div><div class="lbl">Parcels</div></div>
       <div class="stat"><div class="num"><span data-count="120.14" data-dec="2">0</span></div><div class="lbl">Contiguous block (ac)</div></div>
-      <div class="stat"><div class="num"><span data-count="1806">0</span></div><div class="lbl">Oldest structure</div></div>
+      <div class="stat"><div class="num"><span data-count="1800">0</span></div><div class="lbl">Oldest structure (c.1800)</div></div>
     </div>
   </div>
 </header>
@@ -207,11 +231,22 @@ footer{border-top:1px solid var(--line);padding:34px 0 44px;font-size:12.5px;col
         <button class="chip" data-view="hamer">Hamer cluster</button>
         <button class="chip" data-view="perry">Perryopolis block</button>
       </div>
+      <div class="lyrchips" id="lyrchips">
+        <button class="lyrchip" data-lyr="structures"><span class="sw" style="background:#e2a93e"></span>Structures</button>
+        <button class="lyrchip" data-lyr="waterways"><span class="sw" style="background:#4da3ff"></span>Waterways</button>
+        <button class="lyrchip" data-lyr="roads"><span class="sw" style="background:#f2ede3"></span>Roads</button>
+      </div>
       <div class="basemap">
         <button class="active" data-base="sat">Satellite</button>
         <button data-base="street">Streets</button>
       </div>
       <div class="map-hint">Tap a parcel for details &middot; pinch or use +/&minus; to zoom</div>
+      <div class="map-legend" id="map-legend">
+        <div class="li"><span class="sw" style="background:#e2a93e"></span><span><b>Structures</b> &mdash; Realist + aerial</span></div>
+        <div class="li"><span class="ln" style="background:#4da3ff"></span><span><b>Waterways</b> &mdash; OpenStreetMap</span></div>
+        <div class="li"><span class="ln" style="background:#f2ede3"></span><span><b>Roads</b> &mdash; OpenStreetMap*</span></div>
+        <div style="margin-top:6px;font-size:10.5px">*Road geometry: southern block. Hamer-area roads on Streets basemap. Easements: none shown in Realist for any parcel &mdash; verify via title search.</div>
+      </div>
       <aside class="panel" id="panel" aria-live="polite">
         <button class="close" id="panel-close" aria-label="Close">&times;</button>
         <div class="p-color" id="p-color"></div>
@@ -222,7 +257,16 @@ footer{border-top:1px solid var(--line);padding:34px 0 44px;font-size:12.5px;col
           <dt>Location</dt><dd id="p-loc"></dd>
           <dt>Township &amp; schools</dt><dd id="p-ts"></dd>
           <dt>About this parcel</dt><dd id="p-about"></dd>
+          <dt>Structures &amp; improvements</dt><dd id="p-struct"></dd>
+          <dt>Flood zone</dt><dd id="p-flood"></dd>
+          <dt>Waterways</dt><dd id="p-water"></dd>
+          <dt>Utilities</dt><dd id="p-utils"></dd>
+          <dt>Annual taxes</dt><dd id="p-tax"></dd>
+          <dt>Road frontage &amp; access</dt><dd id="p-road"></dd>
+          <dt>Easements / rights-of-way</dt><dd id="p-ease"></dd>
+          <dt>Sale history</dt><dd id="p-hist"></dd>
         </dl>
+        <div class="p-note" id="p-note" style="display:none"></div>
       </aside>
     </div>
   </div>
@@ -277,7 +321,7 @@ footer{border-top:1px solid var(--line);padding:34px 0 44px;font-size:12.5px;col
 <section style="padding-top:10px">
   <div class="wrap">
     <div class="disclaimer reveal">
-      <b>Important &mdash; please read:</b> This page is a marketing illustration for discussion purposes only. Parcel boundaries are drawn from the PASDA February-2026 republication of Fayette County parcel geometry and have not been field-verified. <b>This is not a survey, not a legal boundary map, and not a title opinion.</b> Verify all boundaries, acreage, and title with the Fayette County Assessment Office and a licensed surveyor before any transaction.
+      <b>Important &mdash; please read:</b> This page is a marketing illustration for discussion purposes only. Parcel boundaries are drawn from the PASDA February-2026 republication of Fayette County parcel geometry and have not been field-verified. <b>This is not a survey, not a legal boundary map, and not a title opinion.</b> Verify all boundaries, acreage, and title with the Fayette County Assessment Office and a licensed surveyor before any transaction. Structure locations were interpreted from Esri World Imagery; waterway and road overlays come from OpenStreetMap. Realist (via West Penn MLS Matrix, data current 9/21/2026) shows <b>no easements, rights-of-way, or zoning</b> for these parcels &mdash; confirm through deed and title search. Flood zones per FEMA panels dated 7/18/2017. Ownership shown is the assessed owner per county records; assessment ownership does not establish recorded title.
     </div>
   </div>
 </section>
@@ -300,7 +344,7 @@ footer{border-top:1px solid var(--line);padding:34px 0 44px;font-size:12.5px;col
 
 <footer>
   <div class="wrap">
-    Sources: Fayette County PA assessment records (property.fayettepa.org, last updated 3/17/2026); parcel geometry via PASDA Fayette County Parcels MapServer, region 202602 (Feb 2026 vintage, provided as-is). Ownership shown is the assessed owner per county records; confirm recorded title via deed search. Map imagery &copy; Esri World Imagery. Prepared September 2026.
+    Sources: Fayette County PA assessment records (property.fayettepa.org, last updated 3/17/2026); parcel geometry via PASDA Fayette County Parcels MapServer, region 202602 (Feb 2026 vintage, provided as-is). Ownership shown is the assessed owner per county records; confirm recorded title via deed search. Map imagery &copy; Esri World Imagery. Property characteristics, flood zones, tax figures, and deed history via CoreLogic Realist through West Penn MLS Matrix (data current 9/21/2026); structure locations interpreted from Esri World Imagery; road and waterway overlays &copy; OpenStreetMap contributors. Prepared September 2026.
   </div>
 </footer>
 
@@ -375,6 +419,121 @@ ORDER.forEach(function(id){
   });
 });
 map.fitBounds(allBounds.pad(0.12));
+var WATERWAYS = [{"name":"Unnamed stream","kind":"stream","pts":[[40.108587,-79.80093],[40.108985,-79.801053],[40.109182,-79.801123],[40.109297,-79.801236],[40.109311,-79.801287],[40.109287,-79.801343],[40.109268,-79.801399],[40.109276,-79.801463],[40.109319,-79.801485],[40.109354,-79.801501],[40.109375,-79.801536],[40.109442,-79.801804],[40.109605,-79.802252],[40.109654,-79.80229]]},{"name":"Mill Run","kind":"stream","pts":[[40.11063,-79.791022],[40.11063,-79.791979],[40.11061,-79.792178],[40.110359,-79.793256],[40.110294,-79.793664],[40.110134,-79.796732],[40.109842,-79.801297],[40.109863,-79.801887],[40.109806,-79.802054],[40.109678,-79.802236],[40.109654,-79.80229],[40.10965,-79.802349],[40.10967,-79.802402],[40.109744,-79.802472],[40.109764,-79.802526],[40.109842,-79.802907],[40.110023,-79.803336],[40.11003,-79.803353],[40.110126,-79.803572],[40.11016,-79.8037],[40.110212,-79.803995],[40.110255,-79.804232],[40.11038,-79.804387],[40.110413,-79.804473],[40.110437,-79.804655],[40.110421,-79.804977],[40.11045,-79.805015],[40.110573,-79.80509],[40.110638,-79.80517],[40.110679,-79.805331],[40.1107,-79.805696],[40.110802,-79.8059],[40.110819,-79.805964],[40.110962,-79.806211],[40.111385,-79.807407],[40.11157,-79.807842],[40.111795,-79.808217],[40.111902,-79.808486],[40.111918,-79.808936],[40.112009,-79.809285],[40.112095,-79.80943],[40.112325,-79.80965],[40.112645,-79.809746],[40.11278,-79.80981],[40.112858,-79.80988],[40.112874,-79.809998],[40.112854,-79.810197],[40.112858,-79.81039],[40.112866,-79.810444],[40.112924,-79.810535],[40.112956,-79.810658],[40.11294,-79.810905],[40.112952,-79.811018],[40.113449,-79.812583],[40.113538,-79.812911],[40.113622,-79.813077]]}];
+var SOUTH_ROADS = [{"name":"Fayette City Road","hwy":"secondary","n":134,"near":13,"pts":[[40.083463,-79.826529],[40.083439,-79.826341],[40.083427,-79.826135],[40.083424,-79.825912],[40.083416,-79.825565],[40.083396,-79.82538],[40.083369,-79.825238],[40.083315,-79.825044],[40.083241,-79.824865],[40.083169,-79.824706],[40.083128,-79.824598],[40.083084,-79.824439],[40.083061,-79.824304],[40.083051,-79.824179],[40.083053,-79.82404],[40.08307,-79.823884],[40.083105,-79.823714],[40.083337,-79.82298],[40.083485,-79.822543],[40.083795,-79.821703],[40.084118,-79.820914],[40.084198,-79.820721],[40.08424,-79.820604],[40.084268,-79.820474],[40.084288,-79.820331],[40.084294,-79.820201],[40.0843,-79.820075],[40.084292,-79.81993],[40.084197,-79.819476],[40.084034,-79.818766],[40.083875,-79.818083],[40.083834,-79.817936],[40.083781,-79.8178],[40.083719,-79.817688],[40.083623,-79.81756],[40.08336,-79.817209],[40.083111,-79.816904],[40.082847,-79.816531],[40.082701,-79.816295],[40.082425,-79.815673],[40.082264,-79.815286],[40.082192,-79.815112],[40.082143,-79.815005],[40.082079,-79.814865],[40.082041,-79.814807],[40.082015,-79.81477],[40.081975,-79.814719],[40.081942,-79.814682],[40.081841,-79.814613],[40.081599,-79.81449],[40.081393,-79.814409],[40.081174,-79.814368],[40.08093,-79.814349],[40.080729,-79.814335],[40.080586,-79.814304],[40.080507,-79.814262],[40.08043,-79.814199],[40.080385,-79.814144],[40.080372,-79.814116],[40.080348,-79.814068],[40.080292,-79.813905],[40.080212,-79.813663],[40.080153,-79.813458],[40.080106,-79.813266],[40.08008,-79.813143],[40.080045,-79.812904],[40.080023,-79.812701],[40.080017,-79.812445],[40.080012,-79.812212],[40.080001,-79.811985],[40.079984,-79.811765],[40.079959,-79.811528],[40.079911,-79.811322],[40.07986,-79.811122],[40.079792,-79.810908],[40.079614,-79.810401],[40.079031,-79.808826],[40.078503,-79.807432],[40.078449,-79.807303],[40.078295,-79.806952],[40.078214,-79.806797],[40.07813,-79.806674],[40.077719,-79.8062],[40.077319,-79.805768],[40.076695,-79.805095],[40.076151,-79.804551],[40.075687,-79.804151],[40.075465,-79.803963],[40.075175,-79.803751],[40.07501,-79.803656],[40.074599,-79.803431],[40.07364,-79.802864],[40.072766,-79.802378],[40.072267,-79.802102],[40.071783,-79.801901],[40.071268,-79.801745],[40.071055,-79.801685],[40.070632,-79.801566],[40.069079,-79.801127],[40.068564,-79.80097],[40.068059,-79.800769],[40.06777,-79.800611],[40.067456,-79.800407],[40.06724,-79.800247],[40.066984,-79.80005],[40.065957,-79.799181],[40.065175,-79.798521],[40.064171,-79.797666],[40.063721,-79.797295],[40.063301,-79.796949],[40.062386,-79.796179],[40.062008,-79.795831],[40.061677,-79.795493],[40.061425,-79.795217],[40.061337,-79.795115],[40.061129,-79.794871],[40.060854,-79.794519],[40.06061,-79.79416],[40.060345,-79.793685],[40.06014,-79.793192],[40.059952,-79.792637],[40.059834,-79.7921],[40.059651,-79.790864],[40.059499,-79.789839],[40.059206,-79.787774],[40.059008,-79.786392],[40.058939,-79.785974],[40.058873,-79.785746],[40.058795,-79.785531],[40.058703,-79.785338],[40.058551,-79.785091],[40.058337,-79.784835],[40.058146,-79.784647],[40.057865,-79.784352]]},{"name":"Cope Road","hwy":"residential","n":28,"near":19,"pts":[[40.075687,-79.804151],[40.07795,-79.797537],[40.078063,-79.797151],[40.078178,-79.796748],[40.07824,-79.796579],[40.078334,-79.796394],[40.07873,-79.795681],[40.078853,-79.795442],[40.078983,-79.795158],[40.07911,-79.794847],[40.079436,-79.793996],[40.079746,-79.793167],[40.079941,-79.79273],[40.080118,-79.792272],[40.081119,-79.789619],[40.081141,-79.789573],[40.081191,-79.789466],[40.081281,-79.789321],[40.081827,-79.788594],[40.082008,-79.788396],[40.08219,-79.788211],[40.082418,-79.787985],[40.082623,-79.787765],[40.083001,-79.787355],[40.083235,-79.787119],[40.083908,-79.786483],[40.084167,-79.78622],[40.084449,-79.785946]]},{"name":"Muzina Road","hwy":"residential","n":6,"near":6,"pts":[[40.080491,-79.796217],[40.079695,-79.796043],[40.079481,-79.79596],[40.079266,-79.795839],[40.079032,-79.795657],[40.078853,-79.795442]]},{"name":"Navajo Hollow Road","hwy":"unclassified","n":59,"near":4,"pts":[[40.101378,-79.827905],[40.10123,-79.827808],[40.101045,-79.827666],[40.100851,-79.827498],[40.100713,-79.827336],[40.100445,-79.826957],[40.100082,-79.826453],[40.099942,-79.826213],[40.099734,-79.825795],[40.099503,-79.825413],[40.099371,-79.825174],[40.099295,-79.824982],[40.099235,-79.824786],[40.099184,-79.824533],[40.09914,-79.824194],[40.098995,-79.822934],[40.098892,-79.822028],[40.098823,-79.821603],[40.098756,-79.821341],[40.0987,-79.821186],[40.098635,-79.821036],[40.098508,-79.820855],[40.098268,-79.820569],[40.097727,-79.819846],[40.097371,-79.819372],[40.097211,-79.819194],[40.096618,-79.818643],[40.096354,-79.818407],[40.095362,-79.817514],[40.09504,-79.817218],[40.094059,-79.81633],[40.093452,-79.815783],[40.09305,-79.815416],[40.092962,-79.815337],[40.092893,-79.815275],[40.092815,-79.815219],[40.092699,-79.815166],[40.092551,-79.815123],[40.09227,-79.81506],[40.092107,-79.815021],[40.091969,-79.814988],[40.09162,-79.814906],[40.090742,-79.814724],[40.090622,-79.814694],[40.09053,-79.814663],[40.090434,-79.81462],[40.090344,-79.81455],[40.090217,-79.814408],[40.089734,-79.813823],[40.089067,-79.813008],[40.088843,-79.812741],[40.08873,-79.812606],[40.0886,-79.812468],[40.08844,-79.81232],[40.088271,-79.81218],[40.08796,-79.811924],[40.087391,-79.811474],[40.087341,-79.811445],[40.087283,-79.811428]]},{"name":"Redstone Church Road","hwy":"residential","n":87,"near":50,"pts":[[40.110842,-79.802994],[40.11003,-79.803353],[40.109772,-79.803467],[40.107316,-79.804645],[40.104768,-79.805896],[40.10448,-79.806038],[40.104239,-79.806175],[40.104038,-79.806211],[40.103871,-79.80612],[40.103789,-79.806061],[40.103716,-79.806006],[40.101351,-79.803801],[40.101179,-79.80368],[40.101,-79.803631],[40.100785,-79.803674],[40.100482,-79.803842],[40.100301,-79.803917],[40.099988,-79.804004],[40.099684,-79.804069],[40.099364,-79.804081],[40.099168,-79.804063],[40.098864,-79.804004],[40.098495,-79.803883],[40.097953,-79.803805],[40.097405,-79.803731],[40.096903,-79.803652],[40.096504,-79.803582],[40.096295,-79.803541],[40.096136,-79.803526],[40.095729,-79.803525],[40.095227,-79.803688],[40.094866,-79.803725],[40.094572,-79.803781],[40.094354,-79.803849],[40.094155,-79.803832],[40.093975,-79.803811],[40.093719,-79.803666],[40.093513,-79.803444],[40.09336,-79.803245],[40.0932,-79.803125],[40.093055,-79.803066],[40.092817,-79.80313],[40.092383,-79.803592],[40.092035,-79.803955],[40.091742,-79.804137],[40.091447,-79.804246],[40.091111,-79.804331],[40.090844,-79.804399],[40.090584,-79.804484],[40.090249,-79.804702],[40.089967,-79.804918],[40.08974,-79.805092],[40.089354,-79.805415],[40.088451,-79.806296],[40.088146,-79.806741],[40.088102,-79.80717],[40.088063,-79.807401],[40.087981,-79.807909],[40.087908,-79.808335],[40.087852,-79.8086],[40.087773,-79.808947],[40.087611,-79.809569],[40.087525,-79.809901],[40.087457,-79.810237],[40.087377,-79.810771],[40.087283,-79.811428],[40.087209,-79.811958],[40.087109,-79.812625],[40.086984,-79.81273],[40.086821,-79.812885],[40.08665,-79.813038],[40.086555,-79.813126],[40.086421,-79.813249],[40.086175,-79.813498],[40.085963,-79.813689],[40.085798,-79.813836],[40.085674,-79.81394],[40.08536,-79.814224],[40.085332,-79.814242],[40.085163,-79.814347],[40.085005,-79.814284],[40.084764,-79.814133],[40.084488,-79.813878],[40.084066,-79.813643],[40.083766,-79.813818],[40.083031,-79.814474],[40.082264,-79.815286]]},{"name":"Lincoln Road","hwy":"residential","n":21,"near":1,"pts":[[40.077805,-79.80954],[40.077833,-79.809624],[40.077846,-79.809732],[40.077833,-79.80984],[40.077814,-79.810058],[40.077786,-79.810263],[40.077779,-79.810387],[40.07778,-79.810538],[40.077804,-79.810653],[40.077836,-79.810766],[40.077963,-79.811192],[40.077982,-79.811283],[40.077998,-79.811373],[40.07806,-79.811764],[40.07813,-79.812096],[40.078179,-79.812252],[40.078226,-79.812411],[40.078267,-79.812552],[40.078305,-79.812613],[40.078346,-79.812653],[40.078398,-79.812673]]},{"name":"Jefferson Drive","hwy":"residential","n":49,"near":5,"pts":[[40.079031,-79.808826],[40.07897,-79.808864],[40.078583,-79.80904],[40.078311,-79.809169],[40.078078,-79.809322],[40.077805,-79.80954],[40.077612,-79.809696],[40.077173,-79.810009],[40.077086,-79.810048],[40.077017,-79.810063],[40.076964,-79.81006],[40.076918,-79.810039],[40.07688,-79.810002],[40.076857,-79.809956],[40.076744,-79.809726],[40.076467,-79.809114],[40.076313,-79.808762],[40.076273,-79.808691],[40.076211,-79.808627],[40.076136,-79.808585],[40.076076,-79.80857],[40.076001,-79.808578],[40.075787,-79.808658],[40.075276,-79.808877],[40.074318,-79.809276],[40.073795,-79.809502],[40.073591,-79.809613],[40.073368,-79.809712],[40.073304,-79.809727],[40.07323,-79.80972],[40.073159,-79.809692],[40.073093,-79.809651],[40.073017,-79.809571],[40.072725,-79.809199],[40.072345,-79.808715],[40.072228,-79.808599],[40.07209,-79.808481],[40.071968,-79.808405],[40.071805,-79.80835],[40.071641,-79.808304],[40.071486,-79.808242],[40.071367,-79.808178],[40.071267,-79.808107],[40.071155,-79.807993],[40.071039,-79.807861],[40.070968,-79.807766],[40.070946,-79.80772],[40.070933,-79.807652],[40.07094,-79.807582]]},{"name":"Russell Road","hwy":"unclassified","n":19,"near":1,"pts":[[40.092301,-79.788249],[40.090653,-79.787682],[40.090355,-79.787603],[40.090119,-79.787586],[40.08992,-79.787614],[40.089757,-79.78765],[40.089536,-79.787729],[40.089131,-79.787904],[40.088921,-79.787957],[40.088761,-79.787973],[40.08857,-79.78795],[40.088361,-79.78789],[40.087636,-79.787645],[40.086242,-79.78724],[40.085921,-79.787135],[40.085717,-79.78702],[40.085569,-79.786912],[40.085347,-79.786713],[40.084449,-79.785946]]},{"name":"Coldren Road","hwy":"unclassified","n":23,"near":23,"pts":[[40.089967,-79.804918],[40.088841,-79.805342],[40.086371,-79.805857],[40.083369,-79.806576],[40.083235,-79.806608],[40.081684,-79.806951],[40.080861,-79.807133],[40.080848,-79.807129],[40.080748,-79.807156],[40.080651,-79.8072],[40.080599,-79.807258],[40.08056,-79.807333],[40.080543,-79.807431],[40.080545,-79.807756],[40.080535,-79.807843],[40.080506,-79.807946],[40.080471,-79.808008],[40.080422,-79.808044],[40.080371,-79.808026],[40.080296,-79.808003],[40.080206,-79.807914],[40.079804,-79.80739],[40.079541,-79.807154]]},{"name":"Martinak Avenue","hwy":"unclassified","n":4,"near":4,"pts":[[40.078965,-79.807055],[40.079066,-79.807034],[40.07923,-79.807047],[40.079541,-79.807154]]}];
+
+var STRUCTURES = [
+ {parcel:"41-10-0016-04", label:"Farmhouse \u00B7 c.1800", lat:40.1025243, lon:-79.8139462, conf:"high",
+  desc:"Stone farmhouse, 2 stories, 3,593 sq ft living area. 3 bd / 1 full + 1 half bath, 6 rooms, full basement, 2 fireplaces. Forced-air oil heat, central cooling. Condition: Good.",
+  src:"Building characteristics: CoreLogic Realist via West Penn MLS Matrix (current 9/21/2026). Location interpreted from Esri World Imagery."},
+ {parcel:"41-10-0016-04", label:"Bank barn \u00B7 1917", lat:40.1025112, lon:-79.8142346, conf:"high",
+  desc:"Bank barn, 1,800 sq ft (50\u00D736), built 1917. (A 1990 detached frame/concrete-block garage, 960 sq ft, is also recorded for this parcel.)",
+  src:"Building characteristics: CoreLogic Realist via West Penn MLS Matrix (current 9/21/2026). Location interpreted from Esri World Imagery."},
+ {parcel:"41-10-0017-01", label:"Bungalow \u00B7 1960", lat:40.1035170, lon:-79.8115677, conf:"high",
+  desc:"1-story bungalow, 960 sq ft, 3 bd / 1 bath, aluminum/vinyl exterior, full unfinished basement (308 sq ft), unfinished attic. Forced-air oil heat. Well water, septic tank.",
+  src:"Building characteristics: CoreLogic Realist via West Penn MLS Matrix (current 9/21/2026). Location interpreted from Esri World Imagery."},
+ {parcel:"41-10-0016-03", label:"Possible outbuilding", lat:40.1040596, lon:-79.8116727, conf:"low",
+  desc:"Small white structure visible in aerial imagery; nature unverified. Realist records 1 building on this parcel but shows no characteristics (type, year, size).",
+  src:"Esri World Imagery observation; building count per Realist (no characteristics shown)."},
+ {parcel:"41-19-0029-01", label:"Farmhouse \u00B7 1806", lat:40.0922293, lon:-79.8032249, conf:"high",
+  desc:"Brick farmhouse, 2 stories, 1,760 sq ft, 3 bd / 1 bath, 6 rooms, partial basement, hot-water oil heat. Condition: Fair. Well water, septic tank.",
+  src:"Building characteristics: CoreLogic Realist via West Penn MLS Matrix (current 9/21/2026). Location interpreted from Esri World Imagery."},
+ {parcel:"41-19-0029-01", label:"Barn", lat:40.0924446, lon:-79.8022980, conf:"medium",
+  desc:"Long white barn \u2014 characteristics not shown in Realist; identified from aerial imagery. (A 1970 frame utility shed, 192 sq ft, is also recorded for this parcel.)",
+  src:"Esri World Imagery observation."}
+];
+
+var DETAILS = {
+ "41-10-0016-04": {struct:"c.1800 stone farmhouse (3,593 sq ft, Good) \u00B7 1917 bank barn (1,800 sq ft) \u00B7 1990 detached garage (960 sq ft)",
+  flood:"FEMA Zone A (high risk) \u2014 panel 42051C0152E, dated 7/18/2017",
+  water:"Lamb Lick Run flows along the parcel\u2019s south/southwest boundary (Realist parcel map)",
+  utils:"Public water \u00B7 septic tank", tax:"$2,488/yr \u2014 assessed $80,600 (2026); 96% improved",
+  road:"Fronts Hamer Rd along the parcel\u2019s east side; access via Hamer Rd",
+  ease:"None shown in Realist \u2014 verify via deed/title search",
+  hist:"3/2009 deed \u2192 Robbins Family Living Trust; 9/2023 Special Warranty (nominal) \u2192 Richard L. Robbins II", note:""},
+ "41-10-0016-03": {struct:"Realist records 1 building \u2014 no characteristics shown. Small white structure visible in aerials (nature unverified).",
+  flood:"FEMA Zone X (minimal risk) \u2014 panel 42051C0152E, dated 7/18/2017",
+  water:"Lamb Lick Run flows just west of the parcel, roughly parallel to Hamer Rd",
+  utils:"Not shown in Realist", tax:"$92/yr \u2014 assessed $2,980, land only (2026)",
+  road:"Western boundary fronts Hamer Rd (769\u2032 and 712\u2032 segments along the road)",
+  ease:"None shown in Realist \u2014 verify via deed/title search",
+  hist:"4/2022 deed, $10,000 (Hamer \u2192 Trust); 9/2023 Special Warranty (nominal) \u2192 Robbins II", note:""},
+ "41-10-0017": {struct:"None \u2014 vacant residential lot",
+  flood:"FEMA Zone X (minimal risk) \u2014 panel 42051C0156E, dated 7/18/2017",
+  water:"No waterway on the parcel; Lamb Lick Run lies across Hamer Rd to the south/west",
+  utils:"Not shown in Realist", tax:"$45/yr \u2014 assessed $1,470, land only",
+  road:"110\u2032 of frontage on Hamer Rd (southern boundary)",
+  ease:"None shown in Realist \u2014 verify via deed/title search",
+  hist:"4/2022 deed, $10,000 (Hamer \u2192 Trust); 9/2023 Special Warranty (nominal) \u2192 Robbins II", note:""},
+ "41-10-0017-01": {struct:"1960 bungalow \u2014 1 story, 960 sq ft, 3 bd / 1 ba, full unfinished basement",
+  flood:"FEMA Zone X (minimal risk) \u2014 panel 42051C0156E, dated 7/18/2017",
+  water:"None shown", utils:"Well water \u00B7 septic tank",
+  tax:"$1,617/yr \u2014 assessed $52,380 (2026); 82% improved",
+  road:"On Hamer Rd (no frontage footage in Realist)",
+  ease:"None shown in Realist \u2014 verify via deed/title search",
+  hist:"2017 deed (nominal); 9/2023 Special Warranty (nominal) \u2192 Robbins II", note:""},
+ "41-23-0002": {struct:"None shown \u2014 vacant farmland (rolling/hilly)",
+  flood:"FEMA Zone X (minimal risk) \u2014 panel 42051C0158E, dated 7/18/2017",
+  water:"None shown", utils:"Not shown in Realist",
+  tax:"$623/yr \u2014 assessed $20,180, land only (2026)",
+  road:"Address 26011 Perryopolis Rd (no parcel map / frontage footage in Realist)",
+  ease:"None shown in Realist \u2014 verify via deed/title search",
+  hist:"7/2006 deed, $362,000 multi-parcel purchase; 2009 \u2192 Trust; 2016 CNX RCPC LLC \u2192 Coronado IV LLC (gas co.); 2023 & 2024 nominal transfers \u2192 Robbins II",
+  note:"Mineral-rights flag: related parcel 41-23-0002-GL is held by Kriebel Resources (oil/gas lease interest). Confirm mineral estate with title work."},
+ "41-19-0029-01": {struct:"1806 brick farmhouse (1,760 sq ft, Fair) \u00B7 white barn \u00B7 1970 utility shed (192 sq ft)",
+  flood:"FEMA Zone X (minimal risk) \u2014 panel 42051C0158E, dated 7/18/2017",
+  water:"None shown", utils:"Well water \u00B7 septic tank",
+  tax:"$645/yr \u2014 assessed $20,880 (2026); 84% improved",
+  road:"On Redstone Church Rd (no parcel map / frontage footage in Realist)",
+  ease:"None shown in Realist \u2014 verify via deed/title search",
+  hist:"7/2006 deed, $362,000 multi-parcel purchase; 2009 \u2192 Trust; 2023 & 2024 nominal transfers \u2192 Robbins II", note:""},
+ "17-05-0002": {struct:"None shown \u2014 vacant farmland (flat/level)",
+  flood:"FEMA Zone X (minimal risk) \u2014 panel 42051C0158E, dated 7/18/2017",
+  water:"A stream runs along the parcel\u2019s western boundary (Realist parcel map)",
+  utils:"None \u2014 county notes no utilities",
+  tax:"$27/yr \u2014 assessed $760, land only (2026). Enrolled in Clean & Green (ACT 319).",
+  road:"No road visibly touches the parcel on the Realist parcel map (county describes it as landlocked)",
+  ease:"None shown in Realist \u2014 verify via deed/title search",
+  hist:"7/2006 deed, $362,000 multi-parcel purchase; 2009 \u2192 Trust; 2023 & 2024 nominal transfers \u2192 Robbins II",
+  note:"Mineral-rights flag: related parcel 17-05-0002-GL is held by Kriebel Resources (oil/gas lease interest). Confirm mineral estate with title work."}
+};
+
+/* ============ FEATURE LAYERS: structures, waterways, roads ============ */
+var gStructures = L.layerGroup().addTo(map);
+var gWater = L.layerGroup().addTo(map);
+var gRoads = L.layerGroup().addTo(map);
+
+STRUCTURES.forEach(function(s){
+  var m = L.circleMarker([s.lat, s.lon], {radius:8, color:"#0c100e", weight:2,
+    fillColor:"#e2a93e", fillOpacity:.95}).addTo(gStructures);
+  m.bindTooltip(s.label, {direction:"top", offset:[0,-10], className:"struct-tip"});
+  m.bindPopup("<b>"+s.label+"</b> <span class=\"conf "+s.conf+"\">"+s.conf+" confidence</span><br>"+
+    "<span style=\"font-size:13px\">"+s.desc+"</span>"+
+    "<div class=\"src\"><b>Source:</b> "+s.src+"</div>");
+  m.on("click", function(e){ L.DomEvent.stopPropagation(e); });
+});
+WATERWAYS.forEach(function(w){
+  var pts = w.pts.map(function(p){ return [p[0], p[1]]; });
+  var line = L.polyline(pts, {color:"#4da3ff", weight:2.5, opacity:.85}).addTo(gWater);
+  line.bindPopup("<b>"+w.name+"</b><br><span style=\"font-size:13px\">Stream \u00B7 OpenStreetMap</span>"+
+    "<div class=\"src\">Lamb Lick Run (along 190 Hamer\u2019s S/SW boundary, per Realist) and the stream along the 17-acre parcel\u2019s west boundary are noted in parcel details; drawn geometry was unavailable.</div>");
+});
+SOUTH_ROADS.forEach(function(r){
+  var pts = r.pts.map(function(p){ return [p[0], p[1]]; });
+  var line = L.polyline(pts, {color:"#f2ede3", weight:3, opacity:.85}).addTo(gRoads);
+  line.bindPopup("<b>"+r.name+"</b><div class=\"src\">OpenStreetMap \u00B7 southern-block coverage. Hamer-area roads are visible on the Streets basemap.</div>");
+});
+
+/* layer toggle chips */
+var lyrGroups = {structures:gStructures, waterways:gWater, roads:gRoads};
+document.querySelectorAll("#lyrchips .lyrchip").forEach(function(chip){
+  chip.addEventListener("click", function(){
+    var g = lyrGroups[chip.dataset.lyr];
+    if(map.hasLayer(g)){ map.removeLayer(g); chip.classList.add("off"); }
+    else { g.addTo(map); chip.classList.remove("off"); }
+  });
+});
+
 
 /* base layer toggle */
 var baseBtns = document.querySelectorAll(".basemap button");
@@ -412,6 +571,18 @@ function selectParcel(id, fly){
   document.getElementById("p-loc").textContent = p.loc;
   document.getElementById("p-ts").textContent = p.ts;
   document.getElementById("p-about").textContent = p.about;
+  var d = DETAILS[id] || {};
+  document.getElementById("p-struct").textContent = d.struct || "\u2014";
+  document.getElementById("p-flood").textContent = d.flood || "\u2014";
+  document.getElementById("p-water").textContent = d.water || "\u2014";
+  document.getElementById("p-utils").textContent = d.utils || "\u2014";
+  document.getElementById("p-tax").textContent = d.tax || "\u2014";
+  document.getElementById("p-road").textContent = d.road || "\u2014";
+  document.getElementById("p-ease").textContent = d.ease || "\u2014";
+  document.getElementById("p-hist").textContent = d.hist || "\u2014";
+  var note = document.getElementById("p-note");
+  if(d.note){ note.textContent = d.note; note.style.display = "block"; }
+  else { note.style.display = "none"; }
   panel.classList.add("open");
   document.querySelectorAll(".card").forEach(function(c){ c.classList.toggle("lit", c.dataset.id===id); });
   if(fly){
