@@ -120,6 +120,18 @@ section{padding:72px 0}
 .src{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.5}
 .p-note{background:rgba(226,169,62,.1);border:1px solid rgba(226,169,62,.35);border-radius:10px;
   padding:10px 12px;margin-top:14px;font-size:12.5px;color:var(--cream)}
+.sheet-handle{display:none}
+/* mobile: parcel details become a bottom sheet, not a side panel */
+@media (max-width:768px){
+  .panel{top:auto;left:0;right:0;bottom:0;width:100%;max-height:46%;border-left:none;
+    border-top:1px solid var(--line);border-radius:18px 18px 0 0;transform:translateY(105%);padding:12px 22px 26px}
+  .panel.open{transform:none}
+  .panel.tall{max-height:88%}
+  .sheet-handle{display:block;width:46px;height:5px;border-radius:3px;background:rgba(255,255,255,.28);margin:2px auto 12px;cursor:pointer}
+  .map-legend{display:none}
+  .lyrchips{top:64px;max-width:62%}
+  .panel .close{top:14px;right:16px}
+}
 .panel .close{position:absolute;top:14px;right:14px;background:none;border:1px solid var(--line);color:var(--muted);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:16px;line-height:1}
 .panel .close:hover{color:var(--cream);border-color:var(--gold)}
 /* parcel cards */
@@ -249,6 +261,7 @@ footer{border-top:1px solid var(--line);padding:34px 0 44px;font-size:12.5px;col
       </div>
       <aside class="panel" id="panel" aria-live="polite">
         <button class="close" id="panel-close" aria-label="Close">&times;</button>
+        <div class="sheet-handle" id="sheet-handle" aria-label="Expand details"></div>
         <div class="p-color" id="p-color"></div>
         <div class="p-id" id="p-id"></div>
         <h3 id="p-name"></h3>
@@ -583,6 +596,7 @@ function selectParcel(id, fly){
   var note = document.getElementById("p-note");
   if(d.note){ note.textContent = d.note; note.style.display = "block"; }
   else { note.style.display = "none"; }
+  panel.classList.remove("tall");
   panel.classList.add("open");
   document.querySelectorAll(".card").forEach(function(c){ c.classList.toggle("lit", c.dataset.id===id); });
   if(fly){
@@ -596,6 +610,9 @@ function clearSelection(){
   document.querySelectorAll(".card").forEach(function(c){ c.classList.remove("lit"); });
 }
 document.getElementById("panel-close").addEventListener("click", clearSelection);
+document.getElementById("sheet-handle").addEventListener("click", function(){
+  panel.classList.toggle("tall");
+});
 
 /* view chips */
 var chips = document.querySelectorAll(".map-tools .chip");
