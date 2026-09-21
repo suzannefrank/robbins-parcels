@@ -3,100 +3,502 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Robbins Property Holdings — Parcel Map | Fayette County, PA</title>
+<title>Robbins Land Portfolio — 154 Acres in Fayette County, PA</title>
+<meta name="description" content="Seven parcels, two holdings, ~154 acres in Washington & Jefferson Townships, Fayette County PA. Interactive map and parcel details.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
-  :root { color-scheme: light dark; }
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: #f4f6f8; color: #1c2330; }
-  @media (prefers-color-scheme: dark) { body { background: #12161d; color: #e8ecf1; } }
-  header { background: linear-gradient(135deg, #1e4d7b, #2e7d4f); color: #fff; padding: 28px 24px; }
-  header h1 { margin: 0 0 6px; font-size: 24px; }
-  header p { margin: 0; opacity: .92; font-size: 14px; }
-  main { max-width: 1080px; margin: 0 auto; padding: 20px 16px 40px; }
-  #map { width: 100%; height: 520px; border-radius: 12px; border: 1px solid #d4dbe3; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
-  @media (prefers-color-scheme: dark) { #map { border-color: #2c3440; } }
-  .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 14px 0 6px; font-size: 13px; }
-  .legend span { display: inline-flex; align-items: center; gap: 6px; }
-  .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
-  h2 { margin-top: 28px; font-size: 18px; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
-  .card { background: #fff; border: 1px solid #dfe5ec; border-radius: 10px; padding: 14px 16px; }
-  @media (prefers-color-scheme: dark) { .card { background: #1b212b; border-color: #2c3440; } }
-  .card h3 { margin: 0 0 6px; font-size: 15px; display: flex; align-items: center; gap: 8px; }
-  .card p { margin: 4px 0; font-size: 13px; line-height: 1.5; }
-  .card .meta { color: #5b6675; font-size: 12px; }
-  @media (prefers-color-scheme: dark) { .card .meta { color: #9aa4b2; } }
-  .disclaimer { margin-top: 28px; padding: 14px 16px; border-left: 4px solid #d9a400; background: #fff8e6; border-radius: 0 10px 10px 0; font-size: 13px; line-height: 1.6; }
-  @media (prefers-color-scheme: dark) { .disclaimer { background: #2a2410; } }
-  footer { margin-top: 20px; font-size: 12px; color: #5b6675; line-height: 1.6; }
-  @media (prefers-color-scheme: dark) { footer { color: #9aa4b2; } }
+:root{
+  --ink:#0c100e; --ink2:#121815; --card:#151d19; --line:#263129;
+  --cream:#f3eee1; --muted:#a9a493; --gold:#e2a93e; --gold2:#f5c86a;
+  --sage:#7fb069; --radius:18px;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ink);color:var(--cream);font-family:Inter,system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.serif{font-family:Fraunces,Georgia,serif;line-height:1.08;letter-spacing:-.01em}
+a{color:var(--gold2)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 22px}
+/* ---------- nav ---------- */
+nav{position:sticky;top:0;z-index:1000;backdrop-filter:blur(14px);background:rgba(12,16,14,.78);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+.brand{font-family:Fraunces,serif;font-weight:700;font-size:17px;color:var(--cream);text-decoration:none}
+.brand small{display:block;font-family:Inter;font-weight:500;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.navlinks{display:flex;gap:22px;font-size:13.5px;font-weight:500}
+.navlinks a{color:var(--muted);text-decoration:none;transition:color .2s}
+.navlinks a:hover{color:var(--gold2)}
+@media(max-width:640px){.navlinks{display:none}}
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;padding:96px 0 70px;
+  background:
+    radial-gradient(900px 480px at 12% 8%, rgba(226,169,62,.14), transparent 60%),
+    radial-gradient(800px 500px at 88% 90%, rgba(127,176,105,.12), transparent 60%),
+    var(--ink);}
+.hero::after{content:"";position:absolute;inset:0;opacity:.5;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cg fill='none' stroke='%23263129' stroke-width='1'%3E%3Cpath d='M-20 60 Q60 40 120 70 T260 60'/%3E%3Cpath d='M-20 110 Q60 90 120 120 T260 110'/%3E%3Cpath d='M-20 160 Q60 140 120 170 T260 160'/%3E%3Cpath d='M-20 210 Q60 190 120 220 T260 210'/%3E%3C/g%3E%3C/svg%3E");}
+.hero .wrap{position:relative;z-index:1}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold2);border:1px solid rgba(226,169,62,.4);padding:7px 14px;border-radius:999px;background:rgba(226,169,62,.08)}
+.hero h1{font-size:clamp(2.7rem,7.2vw,5.2rem);margin:26px 0 18px;font-weight:600;max-width:16ch}
+.hero h1 em{font-style:italic;color:var(--gold2)}
+.hero p.lede{font-size:clamp(1rem,2vw,1.2rem);color:var(--muted);max-width:56ch;margin:0 0 34px}
+.cta-row{display:flex;gap:14px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;padding:14px 26px;border-radius:999px;text-decoration:none;transition:transform .15s, box-shadow .15s;cursor:pointer;border:none}
+.btn-gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1a1408;box-shadow:0 6px 24px rgba(226,169,62,.35)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(226,169,62,.45)}
+.btn-ghost{border:1px solid var(--line);color:var(--cream);background:rgba(255,255,255,.03)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold2)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:56px}
+.stat{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px}
+.stat .num{font-family:Fraunces,serif;font-size:clamp(1.7rem,3.4vw,2.5rem);font-weight:700;color:var(--gold2)}
+.stat .lbl{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+@media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+/* ---------- sections ---------- */
+section{padding:72px 0}
+.sec-head{max-width:720px;margin-bottom:36px}
+.sec-head .kicker{font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold2)}
+.sec-head h2{font-size:clamp(1.8rem,4vw,2.7rem);margin:12px 0 10px;font-weight:600}
+.sec-head p{color:var(--muted);margin:0}
+/* holdings cards */
+.holdings{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:760px){.holdings{grid-template-columns:1fr}}
+.hold{background:linear-gradient(160deg,var(--card),#101511);border:1px solid var(--line);border-radius:var(--radius);padding:28px;position:relative;overflow:hidden}
+.hold::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent,var(--gold))}
+.hold h3{margin:0 0 6px;font-size:1.45rem}
+.hold .acres{font-family:Fraunces,serif;font-size:2rem;color:var(--gold2);font-weight:700}
+.hold p{color:var(--muted);font-size:14.5px}
+.hold .btn{margin-top:14px;font-size:13.5px;padding:11px 20px}
+/* ---------- map ---------- */
+#map-section{padding-top:20px}
+.map-shell{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);box-shadow:0 24px 70px rgba(0,0,0,.5)}
+#map{width:100%;height:min(78vh,640px);background:#0a0d0b;z-index:1}
+.map-tools{position:absolute;top:14px;left:14px;z-index:500;display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:rgba(12,16,14,.88);border:1px solid var(--line);color:var(--cream);font-size:12.5px;font-weight:600;padding:9px 15px;border-radius:999px;cursor:pointer;backdrop-filter:blur(8px);transition:all .15s}
+.chip:hover{border-color:var(--gold);color:var(--gold2)}
+.chip.active{background:var(--gold);border-color:var(--gold);color:#1a1408}
+.basemap{position:absolute;top:14px;right:14px;z-index:500;display:flex;background:rgba(12,16,14,.88);border:1px solid var(--line);border-radius:999px;overflow:hidden;backdrop-filter:blur(8px)}
+.basemap button{background:none;border:none;color:var(--muted);font-size:12.5px;font-weight:600;padding:9px 16px;cursor:pointer}
+.basemap button.active{background:rgba(226,169,62,.18);color:var(--gold2)}
+.map-hint{position:absolute;bottom:16px;left:14px;z-index:500;background:rgba(12,16,14,.85);border:1px solid var(--line);font-size:12px;color:var(--muted);padding:8px 14px;border-radius:999px;backdrop-filter:blur(8px)}
+.leaflet-container{font-family:Inter,sans-serif}
+.parcel-tip{background:#101511!important;border:1px solid var(--gold)!important;color:var(--cream)!important;border-radius:10px!important;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.5)!important}
+.parcel-tip::before{display:none}
+/* detail panel */
+.panel{position:absolute;top:0;right:0;bottom:0;width:min(360px,88%);z-index:600;background:rgba(16,21,18,.96);backdrop-filter:blur(16px);border-left:1px solid var(--line);padding:26px;overflow-y:auto;transform:translateX(105%);transition:transform .35s cubic-bezier(.2,.8,.25,1)}
+.panel.open{transform:none}
+.panel .p-color{width:100%;height:6px;border-radius:3px;margin-bottom:16px}
+.panel h3{margin:0 0 2px;font-size:1.5rem}
+.panel .p-id{font-size:12px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.panel .p-acres{font-family:Fraunces,serif;font-size:2.1rem;color:var(--gold2);font-weight:700;margin:12px 0 4px}
+.panel .p-acres small{font-size:.9rem;font-family:Inter;color:var(--muted);font-weight:500}
+.panel dl{margin:18px 0 0;font-size:13.5px}
+.panel dt{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:12px}
+.panel dd{margin:3px 0 0;color:var(--cream)}
+.panel .close{position:absolute;top:14px;right:14px;background:none;border:1px solid var(--line);color:var(--muted);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:16px;line-height:1}
+.panel .close:hover{color:var(--cream);border-color:var(--gold)}
+/* parcel cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s;position:relative}
+.card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 16px 40px rgba(0,0,0,.4)}
+.card.lit{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 16px 40px rgba(0,0,0,.4)}
+.card .dot{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:8px;box-shadow:0 0 10px currentColor}
+.card h3{margin:0 0 4px;font-size:1.15rem}
+.card .cid{font-size:11.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.card .ac{font-family:Fraunces,serif;font-size:1.6rem;color:var(--gold2);font-weight:700;margin:10px 0 6px}
+.card p{font-size:13.5px;color:var(--muted);margin:0}
+.card .go{margin-top:12px;font-size:13px;font-weight:600;color:var(--gold2)}
+/* highlights */
+.why{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.why .w{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px}
+.why .w .ico{font-size:26px}
+.why .w h3{margin:10px 0 8px;font-size:1.15rem}
+.why .w p{margin:0;font-size:13.5px;color:var(--muted)}
+/* details table */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--card)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:760px}
+th{text-align:left;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:14px 16px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:13px 16px;border-bottom:1px solid rgba(38,49,41,.6);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:7px}
+/* disclaimer */
+.disclaimer{border:1px solid rgba(226,169,62,.45);background:rgba(226,169,62,.07);border-radius:var(--radius);padding:26px 28px;font-size:14px;color:var(--cream)}
+.disclaimer b{color:var(--gold2)}
+/* contact */
+#contact .box{background:linear-gradient(150deg,#1a241d,#101511);border:1px solid var(--line);border-radius:24px;padding:52px 40px;text-align:center;position:relative;overflow:hidden}
+#contact .box::before{content:"";position:absolute;inset:0;background:radial-gradient(600px 300px at 50% 0%,rgba(226,169,62,.16),transparent 65%)}
+#contact h2{font-size:clamp(1.9rem,4.5vw,2.9rem);margin:0 0 12px;position:relative}
+#contact p{color:var(--muted);max-width:52ch;margin:0 auto 28px;position:relative}
+footer{border-top:1px solid var(--line);padding:34px 0 44px;font-size:12.5px;color:var(--muted);line-height:1.7}
+/* reveal animation */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.25,1)}
+.reveal.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
-<header>
-  <h1>Robbins Property Holdings</h1>
-  <p>Seven parcels · Washington &amp; Jefferson Townships, Fayette County, PA · Owner: Robbins Richard L II</p>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top">Robbins Land Portfolio<small>Fayette County, PA</small></a>
+    <div class="navlinks">
+      <a href="#holdings">Holdings</a><a href="#map-section">Map</a><a href="#parcels">Parcels</a><a href="#details">Details</a><a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Fayette County &middot; Pennsylvania</span>
+    <h1><em>154 acres.</em> Seven parcels. One rare offering.</h1>
+    <p class="lede">Two distinct holdings &mdash; a Hamer Road cluster and a contiguous 120-acre Perryopolis block, about a mile apart in Washington &amp; Jefferson Townships. Farms, frontage, and a brick farmhouse dating to 1806.</p>
+    <div class="cta-row">
+      <a class="btn btn-gold" href="#map-section">Explore the map</a>
+      <a class="btn btn-ghost" href="#parcels">Meet the parcels</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="num"><span data-count="153.97" data-dec="2">0</span></div><div class="lbl">Total acres</div></div>
+      <div class="stat"><div class="num"><span data-count="7">0</span></div><div class="lbl">Parcels</div></div>
+      <div class="stat"><div class="num"><span data-count="120.14" data-dec="2">0</span></div><div class="lbl">Contiguous block (ac)</div></div>
+      <div class="stat"><div class="num"><span data-count="1806">0</span></div><div class="lbl">Oldest structure</div></div>
+    </div>
+  </div>
 </header>
+
 <main>
-  <div id="map"></div>
-  <div class="legend">
-    <span><i class="swatch" style="background:#3388ff"></i>190 Hamer Rd · 10.54 ac (2 parts)</span>
-    <span><i class="swatch" style="background:#33a852"></i>Farm · 22.26 ac (2 parts)</span>
-    <span><i class="swatch" style="background:#e6b800"></i>221 Hamer Rd · 0.778 ac</span>
-    <span><i class="swatch" style="background:#e6b800;opacity:.55"></i>House lot · 0.25 ac</span>
-    <span><i class="swatch" style="background:#9b59b6"></i>41-23-0002 · 30.16 ac</span>
-    <span><i class="swatch" style="background:#16a085"></i>41-19-0029-01 · 72.98 ac</span>
-    <span><i class="swatch" style="background:#ff6b35"></i>17-05-0002 · 17 ac</span>
+<!-- HOLDINGS -->
+<section id="holdings" style="padding-bottom:20px">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker">Two holdings</div>
+      <h2>One portfolio, two personalities</h2>
+      <p>The northern cluster sits along Hamer Road; the southern block is a single connected sweep of farmland. They&rsquo;re about a mile apart and do not touch &mdash; buy together or in pieces.</p>
+    </div>
+    <div class="holdings">
+      <div class="hold reveal" style="--accent:#5fd08a">
+        <h3>Hamer Road Cluster</h3>
+        <div class="acres">33.83 acres</div>
+        <p>Four parcels along Hamer Road: 190 Hamer (10.54 ac in two parts), an adjoining 22.26-acre farm, a vacant 0.78-acre lot at 221 Hamer, and a quarter-acre homesite with a 1960 bungalow. Road frontage, Washington Township, Belle Vernon Area schools.</p>
+        <button class="btn btn-ghost" data-fly="hamer">Fly there on the map</button>
+      </div>
+      <div class="hold reveal" style="--accent:#2dd4bf">
+        <h3>Perryopolis Block</h3>
+        <div class="acres">120.14 acres</div>
+        <p>Three adjoining parcels forming one contiguous block: a 72.98-acre farm with an 1806 brick farmhouse on Redstone Church Rd, a 30.16-acre middle piece tying the block together, and a 17-acre Clean&nbsp;&amp;&nbsp;Green parcel near Perryopolis.</p>
+        <button class="btn btn-ghost" data-fly="perry">Fly there on the map</button>
+      </div>
+    </div>
   </div>
-  <p style="font-size:13px;color:#5b6675">Tap any parcel on the map for details. Two distinct groups: the Hamer Rd cluster (north, near Fayette City) and the Perryopolis Rd block (south, ~1.1 mi away). The groups do not touch.</p>
+</section>
 
-  <h2>Hamer Rd cluster</h2>
-  <div class="cards">
-    <div class="card"><h3><i class="swatch" style="background:#3388ff"></i>41-10-0016-04</h3><p><b>190 Hamer Rd</b> · 10.54 acres</p><p class="meta">Two parts: northwest wedge + west-center crescent. Washington Twp, Belle Vernon Area SD.</p></div>
-    <div class="card"><h3><i class="swatch" style="background:#33a852"></i>41-10-0016-03</h3><p><b>Farm</b> · 22.26 acres</p><p class="meta">Two parts: large southern farm + smaller northern piece. Wraps around the 190 Hamer pieces. Washington Twp, Belle Vernon Area SD.</p></div>
-    <div class="card"><h3><i class="swatch" style="background:#e6b800"></i>41-10-0017</h3><p><b>221 Hamer Rd</b> · 0.778 acre</p><p class="meta">Vacant residential lot fronting Hamer Rd. Washington Twp, Belle Vernon Area SD.</p></div>
-    <div class="card"><h3><i class="swatch" style="background:#e6b800;opacity:.55"></i>41-10-0017-01</h3><p><b>Hamer Rd house lot</b> · 0.25 acre</p><p class="meta">Bungalow built 1960, ~960 sq ft. Adjoins 41-10-0017. Washington Twp, Belle Vernon Area SD.</p></div>
+<!-- MAP -->
+<section id="map-section">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker">Interactive map</div>
+      <h2>Walk the boundaries</h2>
+      <p>Satellite view with every parcel outlined. Tap any parcel for its details, or jump between the two holdings.</p>
+    </div>
+    <div class="map-shell reveal">
+      <div id="map"></div>
+      <div class="map-tools">
+        <button class="chip active" data-view="all">All parcels</button>
+        <button class="chip" data-view="hamer">Hamer cluster</button>
+        <button class="chip" data-view="perry">Perryopolis block</button>
+      </div>
+      <div class="basemap">
+        <button class="active" data-base="sat">Satellite</button>
+        <button data-base="street">Streets</button>
+      </div>
+      <div class="map-hint">Tap a parcel for details &middot; pinch or use +/&minus; to zoom</div>
+      <aside class="panel" id="panel" aria-live="polite">
+        <button class="close" id="panel-close" aria-label="Close">&times;</button>
+        <div class="p-color" id="p-color"></div>
+        <div class="p-id" id="p-id"></div>
+        <h3 id="p-name"></h3>
+        <div class="p-acres"><span id="p-acres"></span> <small>acres</small></div>
+        <dl>
+          <dt>Location</dt><dd id="p-loc"></dd>
+          <dt>Township &amp; schools</dt><dd id="p-ts"></dd>
+          <dt>About this parcel</dt><dd id="p-about"></dd>
+        </dl>
+      </aside>
+    </div>
   </div>
+</section>
 
-  <h2>Perryopolis Rd block (~120 contiguous acres)</h2>
-  <div class="cards">
-    <div class="card"><h3><i class="swatch" style="background:#9b59b6"></i>41-23-0002</h3><p><b>Near Perryopolis Rd (Gillespie)</b> · 30.16 acres</p><p class="meta">Middle piece — shares a full boundary with each neighbor. Washington Twp, Belle Vernon Area SD.</p></div>
-    <div class="card"><h3><i class="swatch" style="background:#16a085"></i>41-19-0029-01</h3><p><b>Redstone Church Rd</b> · 72.98 acres</p><p class="meta">Farm with 2-story brick residence (1806, 1,760 sq ft). West piece of the block. Washington Twp, Belle Vernon Area SD.</p></div>
-    <div class="card"><h3><i class="swatch" style="background:#ff6b35"></i>17-05-0002</h3><p><b>Near Perryopolis (TR474)</b> · 17 acres</p><p class="meta">Farm, landlocked, no utilities, Clean &amp; Green (ACT319). East piece of the block. Jefferson Twp, Frazier Area SD.</p></div>
+<!-- PARCELS -->
+<section id="parcels" style="padding-top:20px">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker">The seven parcels</div>
+      <h2>Every piece of the portfolio</h2>
+      <p>Hover to spotlight a parcel on the map &mdash; click any card to fly straight to it.</p>
+    </div>
+    <div class="cards" id="cards"></div>
   </div>
+</section>
 
-  <div class="disclaimer">
-    <b>Important:</b> This map is a schematic illustration for marketing and discussion purposes only. Parcel boundaries are drawn from the PASDA February-2026 republication of Fayette County parcel geometry and have not been field-verified. <b>This is not a survey and not a legal boundary map.</b> Verify all boundaries, acreage, and title with the Fayette County Assessment Office and a licensed surveyor before any transaction.
+<!-- WHY -->
+<section id="why" style="padding-top:10px">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker">Why this land</div>
+      <h2>What makes it worth a look</h2>
+    </div>
+    <div class="why">
+      <div class="w reveal"><div class="ico">&#127795;</div><h3>Real scale, real contiguity</h3><p>120+ acres in a single connected block south of Perryopolis &mdash; the kind of assemblage that rarely comes together in Fayette County &mdash; plus a separate 34-acre road-frontage cluster.</p></div>
+      <div class="w reveal"><div class="ico">&#127984;</div><h3>An 1806 brick farmhouse</h3><p>The Redstone Church Rd farm carries a two-story brick residence built in 1806 (~1,760 sq ft) &mdash; genuine early-American character on working farmland.</p></div>
+      <div class="w reveal"><div class="ico">&#128752;</div><h3>Road frontage &amp; homesites</h3><p>The Hamer cluster fronts Hamer Road with a vacant residential lot and a 1960 bungalow homesite &mdash; immediate use while the acreage works around it.</p></div>
+      <div class="w reveal"><div class="ico">&#127793;</div><h3>Clean &amp; Green enrollment</h3><p>The 17-acre Jefferson Township parcel is enrolled in Pennsylvania&rsquo;s Clean &amp; Green program (ACT 319), carrying reduced agricultural-use tax assessment.</p></div>
+    </div>
   </div>
+</section>
 
-  <footer>
-    Sources: Fayette County PA assessment records (property.fayettepa.org, last updated 3/17/2026); parcel geometry via PASDA Fayette County Parcels MapServer, region 202602 (Feb 2026 vintage, provided as-is). Ownership shown is assessed owner per county records; confirm recorded title via deed search. Prepared September 2026.
-  </footer>
+<!-- DETAILS -->
+<section id="details" style="padding-top:10px">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker">At a glance</div>
+      <h2>Parcel details</h2>
+      <p>County parcel IDs, acreage, and township &mdash; straight from Fayette County assessment records.</p>
+    </div>
+    <div class="tablewrap reveal">
+      <table>
+        <thead><tr><th>Parcel ID</th><th>Location</th><th>Acres</th><th>Township</th><th>School district</th><th>Notes</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- DISCLAIMER -->
+<section style="padding-top:10px">
+  <div class="wrap">
+    <div class="disclaimer reveal">
+      <b>Important &mdash; please read:</b> This page is a marketing illustration for discussion purposes only. Parcel boundaries are drawn from the PASDA February-2026 republication of Fayette County parcel geometry and have not been field-verified. <b>This is not a survey, not a legal boundary map, and not a title opinion.</b> Verify all boundaries, acreage, and title with the Fayette County Assessment Office and a licensed surveyor before any transaction.
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" style="padding-top:20px">
+  <div class="wrap">
+    <div class="box reveal">
+      <h2>Walk this land with Suzanne</h2>
+      <p>Questions on any parcel &mdash; or the portfolio as a whole? Private showings and full assessment packets available on request.</p>
+      <div class="cta-row" style="justify-content:center;position:relative">
+        <a class="btn btn-gold" href="mailto:suz@suzfranksells.com?subject=Robbins%20Land%20Portfolio%20inquiry">Email Suzanne</a>
+        <a class="btn btn-ghost" href="#map-section">Back to the map</a>
+      </div>
+      <p style="margin:26px 0 0;font-size:13px">Suzanne Frank &middot; Park Place Realty Group &middot; Fayette County, PA</p>
+    </div>
+  </div>
+</section>
 </main>
+
+<footer>
+  <div class="wrap">
+    Sources: Fayette County PA assessment records (property.fayettepa.org, last updated 3/17/2026); parcel geometry via PASDA Fayette County Parcels MapServer, region 202602 (Feb 2026 vintage, provided as-is). Ownership shown is the assessed owner per county records; confirm recorded title via deed search. Map imagery &copy; Esri World Imagery. Prepared September 2026.
+  </div>
+</footer>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function(){
-var map = L.map('map');
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '© OpenStreetMap contributors'}).addTo(map);
-var all = [];
-function addPoly(coords, color, popup){
-  var p = L.polygon(coords, {color: color, weight: 2, fillColor: color, fillOpacity: 0.35}).addTo(map).bindPopup(popup);
-  all.push(p);
+"use strict";
+/* ============ DATA (exact PASDA geometry, verbatim) ============ */
+var PARCELS = {
+  "41-10-0016-04": { name:"190 Hamer Rd", acres:10.54, color:"#4da3ff", cluster:"hamer",
+    loc:"190 Hamer Rd", ts:"Washington Twp \u00B7 Belle Vernon Area SD",
+    about:"Two noncontiguous parts: a northwest wedge and a west-center crescent of open ground along Hamer Road.",
+    polys:[[[40.1029114,-79.8125010],[40.1026793,-79.8132093],[40.1026113,-79.8133743],[40.1025158,-79.8135285],[40.1022108,-79.8138731],[40.1017978,-79.8143188],[40.1029566,-79.8151519],[40.1037685,-79.8131711]],
+            [[40.1022364,-79.8129640],[40.1019261,-79.8126227],[40.1004178,-79.8142405],[40.1007017,-79.8145964],[40.1010785,-79.8143397],[40.1013518,-79.8147184],[40.1017596,-79.8142824],[40.1021788,-79.8138249],[40.1024727,-79.8134844],[40.1025604,-79.8133431],[40.1026341,-79.8131849],[40.1028664,-79.8124689],[40.1028097,-79.8124309],[40.1025458,-79.8126086]]] },
+  "41-10-0016-03": { name:"Hamer Rd Farm", acres:22.26, color:"#5fd08a", cluster:"hamer",
+    loc:"Hamer Rd (farm)", ts:"Washington Twp \u00B7 Belle Vernon Area SD",
+    about:"Two parts: a large southern farm plus a smaller northern piece that wraps around the 190 Hamer parcels.",
+    polys:[[[40.1004178,-79.8142405],[40.1019261,-79.8126227],[40.1022364,-79.8129640],[40.1025458,-79.8126086],[40.1028097,-79.8124309],[40.1028664,-79.8124689],[40.1030833,-79.8119041],[40.1027356,-79.8122781],[40.1018638,-79.8116263],[40.1009124,-79.8108930],[40.0981143,-79.8126287],[40.0992670,-79.8146988],[40.0996519,-79.8135183]],
+            [[40.1031265,-79.8119383],[40.1029114,-79.8125010],[40.1037685,-79.8131711],[40.1043496,-79.8117766],[40.1034443,-79.8111139],[40.1034020,-79.8112137],[40.1036463,-79.8113750],[40.1039857,-79.8115996],[40.1037070,-79.8123219]]] },
+  "41-10-0017": { name:"221 Hamer Rd", acres:0.778, color:"#ffd23f", cluster:"hamer",
+    loc:"221 Hamer Rd", ts:"Washington Twp \u00B7 Belle Vernon Area SD",
+    about:"Vacant residential lot fronting Hamer Road \u2014 a ready building site inside the cluster.",
+    polys:[[[40.1032611,-79.8115853],[40.1031265,-79.8119383],[40.1037070,-79.8123219],[40.1039857,-79.8115996],[40.1036463,-79.8113750],[40.1034957,-79.8117276]]] },
+  "41-10-0017-01": { name:"Hamer Homesite", acres:0.25, color:"#ff9f43", cluster:"hamer",
+    loc:"Hamer Rd (no street number)", ts:"Washington Twp \u00B7 Belle Vernon Area SD",
+    about:"Quarter-acre homesite with a 1960 bungalow (~960 sq ft). Adjoins the 221 Hamer lot.",
+    polys:[[[40.1032611,-79.8115853],[40.1034957,-79.8117276],[40.1036463,-79.8113750],[40.1034020,-79.8112137]]] },
+  "41-23-0002": { name:"Perryopolis Middle Tract", acres:30.16, color:"#c77dff", cluster:"perry",
+    loc:"Near Perryopolis Rd (Gillespie area)", ts:"Washington Twp \u00B7 Belle Vernon Area SD",
+    about:"The keystone of the southern block \u2014 a 30-acre middle piece sharing a full boundary with each neighbor.",
+    polys:[[[40.089258,-79.802777],[40.087475,-79.798523],[40.090755,-79.796728],[40.091786,-79.798755]]] },
+  "41-19-0029-01": { name:"Redstone Church Farm", acres:72.983, color:"#2dd4bf", cluster:"perry",
+    loc:"Redstone Church Rd (no street number)", ts:"Washington Twp \u00B7 Belle Vernon Area SD",
+    about:"The anchor: ~73 acres of farm with a two-story old-style brick residence built in 1806 (~1,760 sq ft).",
+    polys:[[[40.095899,-79.80347],[40.094286,-79.803784],[40.09412,-79.803797],[40.093939,-79.803758],[40.093762,-79.80365],[40.093634,-79.803524],[40.093296,-79.803138],[40.093161,-79.803039],[40.09299,-79.80302],[40.092815,-79.803079],[40.092659,-79.803202],[40.092459,-79.80345],[40.092156,-79.803833],[40.091949,-79.803987],[40.091826,-79.804053],[40.091666,-79.804105],[40.090701,-79.804408],[40.090519,-79.804483],[40.090208,-79.804718],[40.088919,-79.803316],[40.089258,-79.802777],[40.091786,-79.798755],[40.093701,-79.795687],[40.093887,-79.795383]]] },
+  "17-05-0002": { name:"Clean & Green Tract", acres:17, color:"#ff6b6b", cluster:"perry",
+    loc:"Near Perryopolis (TR474)", ts:"Jefferson Twp \u00B7 Frazier Area SD",
+    about:"17-acre farm parcel on the block's east edge. County records note: landlocked, no utilities, enrolled in Clean & Green (ACT 319).",
+    polys:[[[40.087475,-79.798523],[40.086975,-79.797246],[40.088126,-79.795589],[40.087605,-79.794811],[40.089255,-79.793711],[40.090755,-79.796728]]] }
+};
+var ORDER = ["41-10-0016-04","41-10-0016-03","41-10-0017","41-10-0017-01","41-23-0002","41-19-0029-01","17-05-0002"];
+
+/* ============ MAP ============ */
+var sat = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  {maxZoom:19, attribution:"Imagery \u00A9 Esri & contributors"});
+var street = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {maxZoom:19, attribution:"\u00A9 OpenStreetMap contributors"});
+var map = L.map("map", {layers:[sat], scrollWheelZoom:false, zoomControl:true});
+map.attributionControl.setPrefix(false);
+L.control.scale({imperial:true, metric:false}).addTo(map);
+map.on("click", function(){ map.scrollWheelZoom.enable(); });
+map.on("mouseout", function(){ map.scrollWheelZoom.disable(); });
+
+var layers = {};   // parcel id -> [L.polygon]
+var allBounds = L.latLngBounds([]);
+var clusterBounds = {hamer:L.latLngBounds([]), perry:L.latLngBounds([])};
+
+function baseStyle(c){ return {color:"#ffffff", weight:2.5, opacity:.95, fillColor:c, fillOpacity:.42}; }
+function hiStyle(c){ return {color:"#ffffff", weight:4, opacity:1, fillColor:c, fillOpacity:.62}; }
+
+ORDER.forEach(function(id){
+  var p = PARCELS[id];
+  layers[id] = p.polys.map(function(coords){
+    var poly = L.polygon(coords, baseStyle(p.color)).addTo(map);
+    poly.bindTooltip("<b>"+id+"</b> \u00B7 "+p.acres+" ac", {sticky:true, direction:"top", className:"parcel-tip"});
+    poly.on("mouseover", function(){ if(selected!==id) poly.setStyle(hiStyle(p.color)); });
+    poly.on("mouseout", function(){ if(selected!==id) poly.setStyle(baseStyle(p.color)); });
+    poly.on("click", function(e){ L.DomEvent.stopPropagation(e); selectParcel(id, true); });
+    allBounds.extend(poly.getBounds());
+    clusterBounds[p.cluster].extend(poly.getBounds());
+    return poly;
+  });
+});
+map.fitBounds(allBounds.pad(0.12));
+
+/* base layer toggle */
+var baseBtns = document.querySelectorAll(".basemap button");
+baseBtns.forEach(function(b){
+  b.addEventListener("click", function(){
+    baseBtns.forEach(function(x){x.classList.remove("active")});
+    b.classList.add("active");
+    if(b.dataset.base==="sat"){ map.removeLayer(street); sat.addTo(map); }
+    else { map.removeLayer(sat); street.addTo(map); }
+  });
+});
+
+/* ============ SELECTION + PANEL ============ */
+var selected = null;
+var panel = document.getElementById("panel");
+function dimOthers(id){
+  ORDER.forEach(function(oid){
+    layers[oid].forEach(function(poly){
+      poly.setStyle(oid===id ? hiStyle(PARCELS[oid].color)
+        : {color:"#ffffff", weight:1.2, opacity:.5, fillColor:PARCELS[oid].color, fillOpacity:.10});
+    });
+  });
 }
-addPoly([[40.1004178,-79.8142405],[40.1019261,-79.8126227],[40.1022364,-79.8129640],[40.1025458,-79.8126086],[40.1028097,-79.8124309],[40.1028664,-79.8124689],[40.1030833,-79.8119041],[40.1027356,-79.8122781],[40.1018638,-79.8116263],[40.1009124,-79.8108930],[40.0981143,-79.8126287],[40.0992670,-79.8146988],[40.0996519,-79.8135183]], '#1e7a34', '<b>41-10-0016-03</b> · Farm · 22.26 ac<br>Southern farm part');
-addPoly([[40.1031265,-79.8119383],[40.1029114,-79.8125010],[40.1037685,-79.8131711],[40.1043496,-79.8117766],[40.1034443,-79.8111139],[40.1034020,-79.8112137],[40.1036463,-79.8113750],[40.1039857,-79.8115996],[40.1037070,-79.8123219]], '#1e7a34', '<b>41-10-0016-03</b> · Farm · 22.26 ac<br>Northern part');
-addPoly([[40.1029114,-79.8125010],[40.1026793,-79.8132093],[40.1026113,-79.8133743],[40.1025158,-79.8135285],[40.1022108,-79.8138731],[40.1017978,-79.8143188],[40.1029566,-79.8151519],[40.1037685,-79.8131711]], '#1a6fd4', '<b>41-10-0016-04</b> · 190 Hamer Rd · 10.54 ac<br>Northwest wedge');
-addPoly([[40.1022364,-79.8129640],[40.1019261,-79.8126227],[40.1004178,-79.8142405],[40.1007017,-79.8145964],[40.1010785,-79.8143397],[40.1013518,-79.8147184],[40.1017596,-79.8142824],[40.1021788,-79.8138249],[40.1024727,-79.8134844],[40.1025604,-79.8133431],[40.1026341,-79.8131849],[40.1028664,-79.8124689],[40.1028097,-79.8124309],[40.1025458,-79.8126086]], '#1a6fd4', '<b>41-10-0016-04</b> · 190 Hamer Rd · 10.54 ac<br>West-center crescent');
-addPoly([[40.1032611,-79.8115853],[40.1031265,-79.8119383],[40.1037070,-79.8123219],[40.1039857,-79.8115996],[40.1036463,-79.8113750],[40.1034957,-79.8117276]], '#b39000', '<b>41-10-0017</b> · 221 Hamer Rd · 0.778 ac');
-addPoly([[40.1032611,-79.8115853],[40.1034957,-79.8117276],[40.1036463,-79.8113750],[40.1034020,-79.8112137]], '#b39000', '<b>41-10-0017-01</b> · House lot · 0.25 ac');
-addPoly([[40.089258,-79.802777],[40.087475,-79.798523],[40.090755,-79.796728],[40.091786,-79.798755]], '#7d3c98', '<b>41-23-0002</b> · 30.16 ac<br>Middle piece');
-addPoly([[40.095899,-79.80347],[40.094286,-79.803784],[40.09412,-79.803797],[40.093939,-79.803758],[40.093762,-79.80365],[40.093634,-79.803524],[40.093296,-79.803138],[40.093161,-79.803039],[40.09299,-79.80302],[40.092815,-79.803079],[40.092659,-79.803202],[40.092459,-79.80345],[40.092156,-79.803833],[40.091949,-79.803987],[40.091826,-79.804053],[40.091666,-79.804105],[40.090701,-79.804408],[40.090519,-79.804483],[40.090208,-79.804718],[40.088919,-79.803316],[40.089258,-79.802777],[40.091786,-79.798755],[40.093701,-79.795687],[40.093887,-79.795383]], '#0e7c61', '<b>41-19-0029-01</b> · Redstone Church Rd · 72.98 ac');
-addPoly([[40.087475,-79.798523],[40.086975,-79.797246],[40.088126,-79.795589],[40.087605,-79.794811],[40.089255,-79.793711],[40.090755,-79.796728]], '#c44e12', '<b>17-05-0002</b> · 17 ac · Jefferson Twp');
-var bounds = L.latLngBounds([]);
-all.forEach(function(p){ bounds.extend(p.getBounds()); });
-map.fitBounds(bounds.pad(0.15));
-L.control.scale().addTo(map);
+function resetStyles(){
+  ORDER.forEach(function(oid){ layers[oid].forEach(function(poly){ poly.setStyle(baseStyle(PARCELS[oid].color)); }); });
+}
+function selectParcel(id, fly){
+  selected = id;
+  var p = PARCELS[id];
+  dimOthers(id);
+  document.getElementById("p-color").style.background = p.color;
+  document.getElementById("p-id").textContent = "Parcel " + id;
+  document.getElementById("p-name").textContent = p.name;
+  document.getElementById("p-acres").textContent = p.acres;
+  document.getElementById("p-loc").textContent = p.loc;
+  document.getElementById("p-ts").textContent = p.ts;
+  document.getElementById("p-about").textContent = p.about;
+  panel.classList.add("open");
+  document.querySelectorAll(".card").forEach(function(c){ c.classList.toggle("lit", c.dataset.id===id); });
+  if(fly){
+    var b = L.latLngBounds([]);
+    layers[id].forEach(function(poly){ b.extend(poly.getBounds()); });
+    map.flyToBounds(b.pad(0.6), {duration:1.1});
+  }
+}
+function clearSelection(){
+  selected = null; resetStyles(); panel.classList.remove("open");
+  document.querySelectorAll(".card").forEach(function(c){ c.classList.remove("lit"); });
+}
+document.getElementById("panel-close").addEventListener("click", clearSelection);
+
+/* view chips */
+var chips = document.querySelectorAll(".map-tools .chip");
+function setView(v){
+  chips.forEach(function(c){ c.classList.toggle("active", c.dataset.view===v); });
+  clearSelection();
+  if(v==="all") map.flyToBounds(allBounds.pad(0.12), {duration:1.1});
+  else map.flyToBounds(clusterBounds[v].pad(0.18), {duration:1.1});
+}
+chips.forEach(function(c){ c.addEventListener("click", function(){ setView(c.dataset.view); }); });
+
+/* holdings fly buttons */
+document.querySelectorAll("[data-fly]").forEach(function(b){
+  b.addEventListener("click", function(){
+    document.getElementById("map-section").scrollIntoView({behavior:"smooth"});
+    setTimeout(function(){ setView(b.dataset.fly); }, 450);
+  });
+});
+
+/* ============ CARDS + TABLE ============ */
+var cardsEl = document.getElementById("cards");
+var tbody = document.getElementById("tbody");
+ORDER.forEach(function(id){
+  var p = PARCELS[id];
+  var card = document.createElement("div");
+  card.className = "card reveal"; card.dataset.id = id;
+  card.innerHTML = '<div class="cid"><span class="dot" style="background:'+p.color+';color:'+p.color+'"></span>'+id+'</div>'+
+    '<h3>'+p.name+'</h3><div class="ac">'+p.acres+' ac</div><p>'+p.about+'</p><div class="go">View on map \u2192</div>';
+  card.addEventListener("mouseenter", function(){
+    if(selected) return;
+    layers[id].forEach(function(poly){ poly.setStyle(hiStyle(p.color)); });
+  });
+  card.addEventListener("mouseleave", function(){
+    if(selected) return;
+    layers[id].forEach(function(poly){ poly.setStyle(baseStyle(p.color)); });
+  });
+  card.addEventListener("click", function(){
+    document.getElementById("map-section").scrollIntoView({behavior:"smooth"});
+    setTimeout(function(){ selectParcel(id, true); }, 450);
+  });
+  cardsEl.appendChild(card);
+
+  var tr = document.createElement("tr");
+  tr.innerHTML = '<td><span class="dot" style="background:'+p.color+'"></span><b>'+id+'</b></td>'+
+    '<td>'+p.loc+'</td><td>'+p.acres+'</td><td>'+p.ts.split(" \u00B7 ")[0]+'</td><td>'+p.ts.split(" \u00B7 ")[1]+'</td><td>'+p.about+'</td>';
+  tbody.appendChild(tr);
+});
+
+/* ============ COUNTERS + REVEAL ============ */
+function animateCount(el){
+  var target = parseFloat(el.dataset.count), dec = parseInt(el.dataset.dec||"0",10);
+  var t0 = null, dur = 1400;
+  function fmt(v){
+    return dec ? v.toFixed(dec) : Math.round(v).toLocaleString("en-US");
+  }
+  function step(t){
+    if(!t0) t0 = t;
+    var k = Math.min((t-t0)/dur, 1), e = 1-Math.pow(1-k,3);
+    el.textContent = fmt(target*e);
+    if(k<1) requestAnimationFrame(step); else el.textContent = fmt(target);
+  }
+  requestAnimationFrame(step);
+}
+var io = new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    if(!e.isIntersecting) return;
+    e.target.classList.add("in");
+    e.target.querySelectorAll("[data-count]").forEach(function(c){ if(!c.dataset.done){ c.dataset.done="1"; animateCount(c);} });
+    if(e.target.hasAttribute("data-count") && !e.target.dataset.done){ e.target.dataset.done="1"; animateCount(e.target); }
+    io.unobserve(e.target);
+  });
+},{threshold:.18});
+document.querySelectorAll(".reveal").forEach(function(el){ io.observe(el); });
+document.querySelectorAll("[data-count]").forEach(function(el){ io.observe(el); });
 })();
 </script>
 </body>
