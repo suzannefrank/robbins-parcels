@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Robbins Call Sheet — Suz's Copy</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
   :root{
     --paper:#faf6ee; --card:#ffffff; --ink:#1f1a12; --muted:#6f6555;
@@ -13,7 +14,7 @@
   *{box-sizing:border-box; margin:0; padding:0}
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     background:var(--paper); color:var(--ink); line-height:1.55; -webkit-font-smoothing:antialiased}
-  .topbar{position:sticky; top:0; z-index:50; background:#1f1a12; color:#fff;
+  .topbar{position:sticky; top:0; z-index:60; background:#1f1a12; color:#fff;
     display:flex; align-items:center; justify-content:space-between; padding:10px 16px}
   .topbar .brand{font-weight:800; letter-spacing:.06em; font-size:13px}
   .topbar .brand small{display:block; font-weight:400; color:#cbbf9f; font-size:11px; letter-spacing:.02em}
@@ -21,7 +22,7 @@
   .btn{appearance:none; border:none; cursor:pointer; font-size:13px; font-weight:700;
     padding:9px 14px; border-radius:9px; background:var(--gold); color:#fff; text-decoration:none}
   .btn.ghost{background:transparent; border:1px solid #5a5245; color:#f3ead6}
-  .wrap{max-width:900px; margin:0 auto; padding:20px 16px 80px}
+  .wrap{max-width:1100px; margin:0 auto; padding:20px 16px 80px}
   h1{font-size:30px; line-height:1.15; letter-spacing:-.01em; margin:18px 0 4px}
   .sub{color:var(--muted); font-size:15px; margin-bottom:18px}
   .brief{background:#1f1a12; color:#f5eedd; border-radius:16px; padding:20px; margin-bottom:26px}
@@ -32,16 +33,36 @@
   .stat .l{font-size:12px; color:#cbbf9f; margin-top:2px}
   h2.sec{font-size:13px; letter-spacing:.14em; color:var(--gold); margin:30px 0 12px;
     padding-top:22px; border-top:2px solid var(--line)}
-  .cluster{margin-bottom:18px}
-  .cluster-head{display:flex; align-items:baseline; gap:10px; margin-bottom:10px}
+  /* ---- sticky map + scrolling cards ---- */
+  .mapzone{display:grid; grid-template-columns:minmax(400px,47%) 1fr; gap:20px; align-items:start}
+  .mapwrap{position:sticky; top:62px; z-index:40}
+  #amap{height:calc(100vh - 140px); min-height:440px; border-radius:14px;
+    border:1px solid var(--line); box-shadow:0 2px 10px rgba(60,45,20,.12); background:#0c100e}
+  .mapctl{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap}
+  .mchip{appearance:none; border:1px solid var(--line); background:#fff; border-radius:999px;
+    font-size:13px; font-weight:700; padding:8px 14px; cursor:pointer; color:var(--ink)}
+  .mchip.on{background:#1f1a12; color:#fff; border-color:#1f1a12}
+  .maphint{font-size:12px; color:var(--muted); margin-top:8px}
+  .parcel-tip{background:#1f1a12; color:#f5eedd; border:1px solid #d9b45c; border-radius:8px; font-size:12px}
+  .parcel-tip::before{display:none}
+  .struct-tip{background:#fff; border:1px solid var(--gold); border-radius:8px; font-size:12px; font-weight:700}
+  .struct-tip::before{display:none}
+  .cluster-head{display:flex; align-items:baseline; gap:10px; margin:18px 0 10px}
+  .cluster-head:first-child{margin-top:0}
   .dot{width:12px; height:12px; border-radius:50%; flex:none; align-self:center}
-  .dot.hamer{background:var(--gold)} .dot.south{background:var(--green)}
+  .dot.hamer{background:var(--gold)} .dot.perry{background:var(--green)}
   .cluster-head h3{font-size:18px}
   .cluster-head .ac{margin-left:auto; font-weight:800; color:var(--muted); font-size:14px; white-space:nowrap}
   .card{background:var(--card); border:1px solid var(--line); border-radius:14px;
-    padding:16px 18px; margin-bottom:12px; box-shadow:0 1px 3px rgba(60,45,20,.06)}
+    padding:16px 18px; margin-bottom:12px; box-shadow:0 1px 3px rgba(60,45,20,.06);
+    transition:box-shadow .25s, border-color .25s; scroll-margin-top:70px}
+  .card.active{border-color:var(--gold); box-shadow:0 0 0 3px var(--gold-soft), 0 2px 10px rgba(60,45,20,.15)}
+  .chead{display:flex; justify-content:space-between; align-items:flex-start; gap:10px}
   .card .pid{font-size:11px; letter-spacing:.12em; color:var(--muted); font-weight:700}
   .card h4{font-size:19px; margin:2px 0 2px}
+  .locate{flex:none; appearance:none; border:1px solid var(--line); background:var(--gold-soft);
+    color:#7a5514; font-size:18px; font-weight:800; width:40px; height:40px; border-radius:10px; cursor:pointer}
+  .locate:active{transform:scale(.94)}
   .card .acres{font-size:15px; font-weight:800; color:var(--gold); margin-bottom:8px}
   .card ul{list-style:none; font-size:14px}
   .card ul li{padding:3px 0 3px 18px; position:relative}
@@ -70,13 +91,22 @@
   footer{margin-top:34px; padding-top:16px; border-top:1px solid var(--line);
     font-size:12px; color:var(--muted)}
   footer a{color:var(--gold)}
+  @media (max-width:899px){
+    .mapzone{display:block}
+    .mapwrap{top:53px; margin:0 -16px 4px; padding:0 0 8px; background:var(--paper)}
+    #amap{height:36vh; min-height:250px; border-radius:0; border-left:none; border-right:none}
+    .mapctl{padding:0 16px}
+    .maphint{padding:0 16px}
+  }
   @media print{
     .topbar .actions{display:none}
     .topbar{position:static}
     body{background:#fff}
-    .wrap{padding:0}
-    .brief{break-inside:avoid}
+    .mapzone{display:block}
+    .mapwrap{position:static}
+    #amap{height:380px}
     .card{break-inside:avoid}
+    .locate{display:none}
   }
 </style>
 </head>
@@ -107,102 +137,79 @@
     </div>
   </div>
 
-  <h2 class="sec">THE PORTFOLIO</h2>
-
-  <div class="cluster">
-    <div class="cluster-head"><span class="dot hamer"></span><h3>Hamer Road cluster</h3><span class="ac">33.83 acres</span></div>
-
-    <div class="card">
-      <div class="pid">PARCEL 41-10-0016-04</div>
-      <h4>190 Hamer Rd — the farmstead</h4>
+  <h2 class="sec">MAP + PARCELS — SCROLL THE DATA, MAP STAYS PUT</h2>
+  <div class="mapzone">
+    <div class="mapwrap">
+      <div id="amap"></div>
+      <div class="mapctl">
+        <button class="mchip on" data-view="all">All parcels</button>
+        <button class="mchip" data-view="hamer">Hamer cluster</button>
+        <button class="mchip" data-view="perry">Southern block</button>
+        <button class="mchip" data-view="sat">Satellite</button>
+        <button class="mchip on" data-view="street" style="display:none">Streets</button>
+      </div>
+      <div class="maphint">Tap a parcel on the map to jump to its card · tap ⌖ on a card to fly the map there.</div>
+    </div>
+    <div class="cards">
+<div class="cluster-head"><span class="dot hamer"></span><h3>Hamer Road cluster</h3><span class="ac">33.83 acres</span></div>
+<div class="card" id="card-41-10-0016-04" data-pid="41-10-0016-04">
+      <div class="chead"><div><div class="pid">PARCEL 41-10-0016-04</div><h4>190 Hamer Rd — the farmstead</h4></div>
+      <button class="locate" data-pid="41-10-0016-04" title="Show on map">⌖</button></div>
       <div class="acres">10.54 acres</div>
-      <ul>
-        <li>c.1800 stone farmhouse — 3,593 sqft, 3 bd / 1.5 ba, 2-story, Good condition, full basement, 2 fireplaces, oil heat + central air</li>
-        <li>1917 bank barn (1,800 sqft) + 1990 detached garage (960 sqft)</li>
-        <li>Public water, septic · Hamer Rd frontage</li>
-        <li>2023 Special Warranty Deed, doc 3559-1827, nominal (trust → Robbins)</li>
-      </ul>
-      <div class="tax">Assessed <b>$80,600</b> · Taxes <b>$2,488/yr</b></div>
+      <ul><li>c.1800 stone farmhouse — 3,593 sqft, 3 bd / 1.5 ba, 2-story, Good, full basement, 2 fireplaces, oil heat + central air</li><li>1917 bank barn (1,800 sqft) + 1990 detached garage (960 sqft)</li><li>Public water, septic · Hamer Rd frontage</li><li>2023 Special Warranty Deed, doc 3559-1827, nominal (trust → Robbins)</li></ul>
+      <div class="tax"><b>Assessed $80,600</b> · <b>Taxes $2,488/yr</b></div>
       <div class="flag warn">FEMA Zone A — high risk. Lamb Lick Run runs along the south/southwest boundary. Ask about any flood history or claims.</div>
     </div>
-
-    <div class="card">
-      <div class="pid">PARCEL 41-10-0016-03</div>
-      <h4>Hamer Rd — north acreage</h4>
+<div class="card" id="card-41-10-0016-03" data-pid="41-10-0016-03">
+      <div class="chead"><div><div class="pid">PARCEL 41-10-0016-03</div><h4>Hamer Rd — north acreage</h4></div>
+      <button class="locate" data-pid="41-10-0016-03" title="Show on map">⌖</button></div>
       <div class="acres">22.26 acres</div>
-      <ul>
-        <li>Realist shows 1 building but gives no characteristics</li>
-        <li>Aerial shows a possible small outbuilding — nature unverified, low confidence</li>
-        <li>Lamb Lick Run just west · FEMA Zone X · Hamer Rd frontage</li>
-        <li>2022 deed doc 3515-2472 ($10,000); 2023 nominal doc 3559-1842</li>
-      </ul>
-      <div class="tax">Assessed <b>$2,980</b> · Taxes <b>$92/yr</b></div>
-      <div class="flag info">Ask him: what's actually on this parcel? Barn, shed, nothing?</div>
+      <ul><li>Realist shows 1 building but gives no characteristics</li><li>Aerial shows a possible small outbuilding — nature unverified, low confidence</li><li>Lamb Lick Run just west · FEMA Zone X · Hamer Rd frontage</li><li>2022 deed doc 3515-2472 ($10,000); 2023 nominal doc 3559-1842</li></ul>
+      <div class="tax"><b>Assessed $2,980</b> · <b>Taxes $92/yr</b></div>
+      <div class="flag info">Ask him: what&#x27;s actually on this parcel? Barn, shed, nothing?</div>
     </div>
-
-    <div class="card">
-      <div class="pid">PARCEL 41-10-0017</div>
-      <h4>221 Hamer Rd — vacant lot</h4>
+<div class="card" id="card-41-10-0017" data-pid="41-10-0017">
+      <div class="chead"><div><div class="pid">PARCEL 41-10-0017</div><h4>221 Hamer Rd — vacant lot</h4></div>
+      <button class="locate" data-pid="41-10-0017" title="Show on map">⌖</button></div>
       <div class="acres">0.778 acre</div>
-      <ul>
-        <li>Vacant residential, no structures · ~110 ft Hamer Rd frontage · FEMA Zone X</li>
-        <li>2022 deed doc 3515-2468 ($10,000); 2023 nominal doc 3559-1837</li>
-      </ul>
-      <div class="tax">Assessed <b>$1,470</b> · Taxes <b>$45/yr</b></div>
+      <ul><li>Vacant residential, no structures · ~110 ft Hamer Rd frontage · FEMA Zone X</li><li>2022 deed doc 3515-2468 ($10,000); 2023 nominal doc 3559-1837</li></ul>
+      <div class="tax"><b>Assessed $1,470</b> · <b>Taxes $45/yr</b></div>
+      
     </div>
-
-    <div class="card">
-      <div class="pid">PARCEL 41-10-0017-01</div>
-      <h4>Hamer Rd — the bungalow</h4>
+<div class="card" id="card-41-10-0017-01" data-pid="41-10-0017-01">
+      <div class="chead"><div><div class="pid">PARCEL 41-10-0017-01</div><h4>Hamer Rd — the bungalow</h4></div>
+      <button class="locate" data-pid="41-10-0017-01" title="Show on map">⌖</button></div>
       <div class="acres">~0.25 acre</div>
-      <ul>
-        <li>1960 bungalow — 960 sqft, 3 bd / 1 ba, full unfinished basement, oil heat</li>
-        <li>Well + septic · FEMA Zone X</li>
-        <li>2023 nominal deed doc 3559-1822</li>
-      </ul>
-      <div class="tax">Assessed <b>$52,380</b> · Taxes <b>$1,617/yr</b></div>
+      <ul><li>1960 bungalow — 960 sqft, 3 bd / 1 ba, full unfinished basement, oil heat</li><li>Well + septic · FEMA Zone X</li><li>2023 nominal deed doc 3559-1822</li></ul>
+      <div class="tax"><b>Assessed $52,380</b> · <b>Taxes $1,617/yr</b></div>
+      
     </div>
-  </div>
-
-  <div class="cluster">
-    <div class="cluster-head"><span class="dot south"></span><h3>Southern block — contiguous</h3><span class="ac">120.14 acres</span></div>
-
-    <div class="card">
-      <div class="pid">PARCEL 41-19-0029-01</div>
-      <h4>Redstone Church Rd — the brick farm</h4>
-      <div class="acres">72.983 acres</div>
-      <ul>
-        <li>1806 brick farmhouse — 1,760 sqft, 3 bd / 1 ba, 2-story, Fair condition, partial basement, oil hot-water heat</li>
-        <li>1970 utility shed (192 sqft); long white barn visible on aerial — no Realist characteristics</li>
-        <li>Well + septic · FEMA Zone X</li>
-        <li>Part of the 2006 multi-parcel purchase ($362,000, doc 2993-2243)</li>
-      </ul>
-      <div class="tax">Assessed <b>$20,880</b> · Taxes <b>$645/yr</b></div>
-      <div class="flag info">Ask about the barn and the well/septic condition — oldest systems on the portfolio.</div>
-    </div>
-
-    <div class="card">
-      <div class="pid">PARCEL 41-23-0002</div>
-      <h4>Farmland — rolling acreage</h4>
+<div class="cluster-head"><span class="dot perry"></span><h3>Southern block — contiguous</h3><span class="ac">120.14 acres</span></div>
+<div class="card" id="card-41-23-0002" data-pid="41-23-0002">
+      <div class="chead"><div><div class="pid">PARCEL 41-23-0002</div><h4>Farmland — rolling acreage</h4></div>
+      <button class="locate" data-pid="41-23-0002" title="Show on map">⌖</button></div>
       <div class="acres">30.16 acres</div>
-      <ul>
-        <li>Vacant rolling/hilly farmland, no structures · FEMA Zone X</li>
-        <li>2006 multi-parcel purchase chain</li>
-      </ul>
-      <div class="tax">Assessed <b>$20,180</b> · Taxes <b>$623/yr</b></div>
+      <ul><li>Vacant rolling/hilly farmland, no structures · FEMA Zone X</li><li>Part of the 2006 multi-parcel purchase ($362,000, doc 2993-2243)</li></ul>
+      <div class="tax"><b>Assessed $20,180</b> · <b>Taxes $623/yr</b></div>
       <div class="flag warn">Kriebel Resources oil/gas lease interest tied to this parcel (41-23-0002-GL). Flag for title — do not assume anything about mineral ownership.</div>
     </div>
-
-    <div class="card">
-      <div class="pid">PARCEL 17-05-0002</div>
-      <h4>The 17-acre piece — landlocked</h4>
+<div class="card" id="card-41-19-0029-01" data-pid="41-19-0029-01">
+      <div class="chead"><div><div class="pid">PARCEL 41-19-0029-01</div><h4>Redstone Church Rd — the brick farm</h4></div>
+      <button class="locate" data-pid="41-19-0029-01" title="Show on map">⌖</button></div>
+      <div class="acres">72.983 acres</div>
+      <ul><li>1806 brick farmhouse — 1,760 sqft, 3 bd / 1 ba, 2-story, Fair condition, partial basement, oil hot-water heat</li><li>1970 utility shed (192 sqft); long white barn visible on aerial — no Realist characteristics</li><li>Well + septic · FEMA Zone X</li><li>Part of the 2006 multi-parcel purchase chain</li></ul>
+      <div class="tax"><b>Assessed $20,880</b> · <b>Taxes $645/yr</b></div>
+      <div class="flag info">Ask about the barn and the well/septic condition — oldest systems on the portfolio.</div>
+    </div>
+<div class="card" id="card-17-05-0002" data-pid="17-05-0002">
+      <div class="chead"><div><div class="pid">PARCEL 17-05-0002</div><h4>The 17-acre piece — landlocked</h4></div>
+      <button class="locate" data-pid="17-05-0002" title="Show on map">⌖</button></div>
       <div class="acres">17 acres</div>
-      <ul>
-        <li>Vacant farmland · county describes it as landlocked, no utilities, enrolled in ACT 319 / Clean &amp; Green</li>
-        <li>Stream along the western boundary · FEMA Zone X · no road frontage shown</li>
-      </ul>
-      <div class="tax">Assessed <b>$760</b> · Taxes <b>$27/yr</b></div>
+      <ul><li>Vacant farmland · county describes it as landlocked, no utilities, enrolled in ACT 319 / Clean &amp; Green</li><li>Stream along the western boundary · FEMA Zone X · no road frontage shown</li></ul>
+      <div class="tax"><b>Assessed $760</b> · <b>Taxes $27/yr</b></div>
       <div class="flag warn">Landlocked on the county map — how is it accessed? Any recorded easement? Also Kriebel lease interest here (17-05-0002-GL).</div>
+    </div>
+
     </div>
   </div>
 
@@ -245,21 +252,179 @@
   <div class="notes">Ticks on the question list save on this device only — they won't follow you to another phone or computer. Hit Print if you want it on paper.</div>
 
   <footer>
-    Parcel facts: CoreLogic Realist via West Penn MLS Matrix, pulled 2026-09-21. Acreages summed from Realist; structures, flood zones, utilities, assessments, taxes, and deed references as shown there. Schematic only — not a survey. Verify through county, deed, title, and field work.<br><br>
+    Parcel facts: CoreLogic Realist via West Penn MLS Matrix, pulled 2026-09-21. Acreages summed from Realist; structures, flood zones, utilities, assessments, taxes, and deed references as shown there. Parcel geometry via PASDA Fayette County Parcels (Feb 2026 vintage). Map imagery &copy; Esri World Imagery. Schematic only — not a survey. Verify through county, deed, title, and field work.<br><br>
     <a href="../">← Back to the buyer-facing Robbins Land Portfolio map</a>
   </footer>
 
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  document.querySelectorAll('#questions input[type=checkbox]').forEach(function(box){
-    var key = 'robbins-callsheet-' + box.id;
-    try { box.checked = localStorage.getItem(key) === '1'; } catch(e) {}
-    var li = box.closest('li');
-    function sync(){ li.classList.toggle('done', box.checked);
-      try { localStorage.setItem(key, box.checked ? '1' : '0'); } catch(e) {} }
-    box.addEventListener('change', sync); sync();
+(function(){
+"use strict";
+var PARCELS = {
+  "41-10-0016-04": { name:"190 Hamer Rd", acres:10.54, color:"#4da3ff", cluster:"hamer",
+    loc:"190 Hamer Rd", ts:"Washington Twp \u00B7 Belle Vernon Area SD",
+    about:"Two noncontiguous parts: a northwest wedge and a west-center crescent of open ground along Hamer Road.",
+    polys:[[[40.1029114,-79.8125010],[40.1026793,-79.8132093],[40.1026113,-79.8133743],[40.1025158,-79.8135285],[40.1022108,-79.8138731],[40.1017978,-79.8143188],[40.1029566,-79.8151519],[40.1037685,-79.8131711]],
+            [[40.1022364,-79.8129640],[40.1019261,-79.8126227],[40.1004178,-79.8142405],[40.1007017,-79.8145964],[40.1010785,-79.8143397],[40.1013518,-79.8147184],[40.1017596,-79.8142824],[40.1021788,-79.8138249],[40.1024727,-79.8134844],[40.1025604,-79.8133431],[40.1026341,-79.8131849],[40.1028664,-79.8124689],[40.1028097,-79.8124309],[40.1025458,-79.8126086]]] },
+  "41-10-0016-03": { name:"Hamer Rd Farm", acres:22.26, color:"#5fd08a", cluster:"hamer",
+    loc:"Hamer Rd (farm)", ts:"Washington Twp \u00B7 Belle Vernon Area SD",
+    about:"Two parts: a large southern farm plus a smaller northern piece that wraps around the 190 Hamer parcels.",
+    polys:[[[40.1004178,-79.8142405],[40.1019261,-79.8126227],[40.1022364,-79.8129640],[40.1025458,-79.8126086],[40.1028097,-79.8124309],[40.1028664,-79.8124689],[40.1030833,-79.8119041],[40.1027356,-79.8122781],[40.1018638,-79.8116263],[40.1009124,-79.8108930],[40.0981143,-79.8126287],[40.0992670,-79.8146988],[40.0996519,-79.8135183]],
+            [[40.1031265,-79.8119383],[40.1029114,-79.8125010],[40.1037685,-79.8131711],[40.1043496,-79.8117766],[40.1034443,-79.8111139],[40.1034020,-79.8112137],[40.1036463,-79.8113750],[40.1039857,-79.8115996],[40.1037070,-79.8123219]]] },
+  "41-10-0017": { name:"221 Hamer Rd", acres:0.778, color:"#ffd23f", cluster:"hamer",
+    loc:"221 Hamer Rd", ts:"Washington Twp \u00B7 Belle Vernon Area SD",
+    about:"Vacant residential lot fronting Hamer Road \u2014 a ready building site inside the cluster.",
+    polys:[[[40.1032611,-79.8115853],[40.1031265,-79.8119383],[40.1037070,-79.8123219],[40.1039857,-79.8115996],[40.1036463,-79.8113750],[40.1034957,-79.8117276]]] },
+  "41-10-0017-01": { name:"Hamer Homesite", acres:0.25, color:"#ff9f43", cluster:"hamer",
+    loc:"Hamer Rd (no street number)", ts:"Washington Twp \u00B7 Belle Vernon Area SD",
+    about:"Quarter-acre homesite with a 1960 bungalow (~960 sq ft). Adjoins the 221 Hamer lot.",
+    polys:[[[40.1032611,-79.8115853],[40.1034957,-79.8117276],[40.1036463,-79.8113750],[40.1034020,-79.8112137]]] },
+  "41-23-0002": { name:"Perryopolis Middle Tract", acres:30.16, color:"#c77dff", cluster:"perry",
+    loc:"Near Perryopolis Rd (Gillespie area)", ts:"Washington Twp \u00B7 Belle Vernon Area SD",
+    about:"The keystone of the southern block \u2014 a 30-acre middle piece sharing a full boundary with each neighbor.",
+    polys:[[[40.089258,-79.802777],[40.087475,-79.798523],[40.090755,-79.796728],[40.091786,-79.798755]]] },
+  "41-19-0029-01": { name:"Redstone Church Farm", acres:72.983, color:"#2dd4bf", cluster:"perry",
+    loc:"Redstone Church Rd (no street number)", ts:"Washington Twp \u00B7 Belle Vernon Area SD",
+    about:"The anchor: ~73 acres of farm with a two-story old-style brick residence built in 1806 (~1,760 sq ft).",
+    polys:[[[40.095899,-79.80347],[40.094286,-79.803784],[40.09412,-79.803797],[40.093939,-79.803758],[40.093762,-79.80365],[40.093634,-79.803524],[40.093296,-79.803138],[40.093161,-79.803039],[40.09299,-79.80302],[40.092815,-79.803079],[40.092659,-79.803202],[40.092459,-79.80345],[40.092156,-79.803833],[40.091949,-79.803987],[40.091826,-79.804053],[40.091666,-79.804105],[40.090701,-79.804408],[40.090519,-79.804483],[40.090208,-79.804718],[40.088919,-79.803316],[40.089258,-79.802777],[40.091786,-79.798755],[40.093701,-79.795687],[40.093887,-79.795383]]] },
+  "17-05-0002": { name:"Clean & Green Tract", acres:17, color:"#ff6b6b", cluster:"perry",
+    loc:"Near Perryopolis (TR474)", ts:"Jefferson Twp \u00B7 Frazier Area SD",
+    about:"17-acre farm parcel on the block's east edge. County records note: landlocked, no utilities, enrolled in Clean & Green (ACT 319).",
+    polys:[[[40.087475,-79.798523],[40.086975,-79.797246],[40.088126,-79.795589],[40.087605,-79.794811],[40.089255,-79.793711],[40.090755,-79.796728]]] }
+};
+
+var ORDER = ["41-10-0016-04","41-10-0016-03","41-10-0017","41-10-0017-01","41-23-0002","41-19-0029-01","17-05-0002"]
+;
+var STRUCTURES = [
+ {parcel:"41-10-0016-04", label:"Farmhouse \u00B7 c.1800", lat:40.1025243, lon:-79.8139462, conf:"high",
+  desc:"Stone farmhouse, 2 stories, 3,593 sq ft living area. 3 bd / 1 full + 1 half bath, 6 rooms, full basement, 2 fireplaces. Forced-air oil heat, central cooling. Condition: Good.",
+  src:"Building characteristics: CoreLogic Realist via West Penn MLS Matrix (current 9/21/2026). Location interpreted from Esri World Imagery."},
+ {parcel:"41-10-0016-04", label:"Bank barn \u00B7 1917", lat:40.1025112, lon:-79.8142346, conf:"high",
+  desc:"Bank barn, 1,800 sq ft (50\u00D736), built 1917. (A 1990 detached frame/concrete-block garage, 960 sq ft, is also recorded for this parcel.)",
+  src:"Building characteristics: CoreLogic Realist via West Penn MLS Matrix (current 9/21/2026). Location interpreted from Esri World Imagery."},
+ {parcel:"41-10-0017-01", label:"Bungalow \u00B7 1960", lat:40.1035170, lon:-79.8115677, conf:"high",
+  desc:"1-story bungalow, 960 sq ft, 3 bd / 1 bath, aluminum/vinyl exterior, full unfinished basement (308 sq ft), unfinished attic. Forced-air oil heat. Well water, septic tank.",
+  src:"Building characteristics: CoreLogic Realist via West Penn MLS Matrix (current 9/21/2026). Location interpreted from Esri World Imagery."},
+ {parcel:"41-10-0016-03", label:"Possible outbuilding", lat:40.1040596, lon:-79.8116727, conf:"low",
+  desc:"Small white structure visible in aerial imagery; nature unverified. Realist records 1 building on this parcel but shows no characteristics (type, year, size).",
+  src:"Esri World Imagery observation; building count per Realist (no characteristics shown)."},
+ {parcel:"41-19-0029-01", label:"Farmhouse \u00B7 1806", lat:40.0922293, lon:-79.8032249, conf:"high",
+  desc:"Brick farmhouse, 2 stories, 1,760 sq ft, 3 bd / 1 bath, 6 rooms, partial basement, hot-water oil heat. Condition: Fair. Well water, septic tank.",
+  src:"Building characteristics: CoreLogic Realist via West Penn MLS Matrix (current 9/21/2026). Location interpreted from Esri World Imagery."},
+ {parcel:"41-19-0029-01", label:"Barn", lat:40.0924446, lon:-79.8022980, conf:"medium",
+  desc:"Long white barn \u2014 characteristics not shown in Realist; identified from aerial imagery. (A 1970 frame utility shed, 192 sq ft, is also recorded for this parcel.)",
+  src:"Esri World Imagery observation."}
+];
+
+/* ---- map ---- */
+var sat = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  {maxZoom:19, attribution:"Imagery \u00A9 Esri & contributors"});
+var street = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {maxZoom:19, attribution:"\u00A9 OpenStreetMap contributors"});
+var map = L.map("amap", {layers:[sat], scrollWheelZoom:false, zoomControl:true});
+map.attributionControl.setPrefix(false);
+L.control.scale({imperial:true, metric:false}).addTo(map);
+map.on("click", function(){ map.scrollWheelZoom.enable(); });
+map.on("mouseout", function(){ map.scrollWheelZoom.disable(); });
+
+function baseStyle(c){ return {color:"#ffffff", weight:2.5, opacity:.95, fillColor:c, fillOpacity:.42}; }
+function hiStyle(c){ return {color:"#ffffff", weight:4, opacity:1, fillColor:c, fillOpacity:.62}; }
+
+var layers = {}, allBounds = L.latLngBounds([]),
+    clusterBounds = {hamer:L.latLngBounds([]), perry:L.latLngBounds([])};
+var selected = null, flashTimer = null;
+
+ORDER.forEach(function(id){
+  var p = PARCELS[id];
+  layers[id] = p.polys.map(function(coords){
+    var poly = L.polygon(coords, baseStyle(p.color)).addTo(map);
+    poly.bindTooltip("<b>"+id+"</b> \u00B7 "+p.acres+" ac", {sticky:true, direction:"top", className:"parcel-tip"});
+    poly.on("mouseover", function(){ if(selected!==id) poly.setStyle(hiStyle(p.color)); });
+    poly.on("mouseout", function(){ if(selected!==id) poly.setStyle(baseStyle(p.color)); });
+    poly.on("click", function(e){ L.DomEvent.stopPropagation(e); agentSelect(id, true, true); });
+    allBounds.extend(poly.getBounds());
+    clusterBounds[p.cluster].extend(poly.getBounds());
+    return poly;
   });
+});
+STRUCTURES.forEach(function(s){
+  var m = L.circleMarker([s.lat, s.lon], {radius:7, color:"#0c100e", weight:2,
+    fillColor:"#e2a93e", fillOpacity:.95}).addTo(map);
+  m.bindTooltip(s.label, {direction:"top", offset:[0,-9], className:"struct-tip"});
+  m.on("click", function(e){ L.DomEvent.stopPropagation(e); });
+});
+map.fitBounds(allBounds.pad(0.12));
+
+function parcelBounds(id){
+  var b = L.latLngBounds([]);
+  layers[id].forEach(function(poly){ b.extend(poly.getBounds()); });
+  return b;
+}
+function agentSelect(id, fly, scroll){
+  if(selected && selected!==id){
+    var prev = PARCELS[selected];
+    layers[selected].forEach(function(poly){ poly.setStyle(baseStyle(prev.color)); });
+    var pc = document.getElementById("card-"+selected);
+    if(pc) pc.classList.remove("active");
+  }
+  selected = id;
+  var p = PARCELS[id];
+  layers[id].forEach(function(poly){ poly.setStyle(hiStyle(p.color)); });
+  if(fly) map.flyToBounds(parcelBounds(id).pad(0.45), {duration:0.8});
+  var card = document.getElementById("card-"+id);
+  if(card){
+    if(scroll) card.scrollIntoView({behavior:"smooth", block:"center"});
+    card.classList.add("active");
+    if(flashTimer) clearTimeout(flashTimer);
+    flashTimer = setTimeout(function(){
+      card.classList.remove("active");
+      if(selected===id){
+        layers[id].forEach(function(poly){ poly.setStyle(baseStyle(p.color)); });
+        selected = null;
+      }
+    }, 2200);
+  }
+}
+
+/* card locate buttons */
+document.querySelectorAll(".locate").forEach(function(btn){
+  btn.addEventListener("click", function(e){
+    e.stopPropagation();
+    agentSelect(btn.dataset.pid, true, false);
+  });
+});
+
+/* map view chips */
+var viewChips = document.querySelectorAll('.mapctl .mchip[data-view]');
+viewChips.forEach(function(chip){
+  chip.addEventListener("click", function(){
+    var v = chip.dataset.view;
+    if(v==="all"||v==="hamer"||v==="perry"){
+      viewChips.forEach(function(c){ if(c.dataset.view==="all"||c.dataset.view==="hamer"||c.dataset.view==="perry") c.classList.remove("on"); });
+      chip.classList.add("on");
+      if(v==="all") map.flyToBounds(allBounds.pad(0.12), {duration:0.8});
+      else map.flyToBounds(clusterBounds[v].pad(0.18), {duration:0.8});
+    } else if(v==="sat"||v==="street"){
+      document.querySelector('[data-view="sat"]').style.display = (v==="sat") ? "none" : "";
+      document.querySelector('[data-view="street"]').style.display = (v==="street") ? "none" : "";
+      if(v==="sat"){ map.removeLayer(street); sat.addTo(map); }
+      else { map.removeLayer(sat); street.addTo(map); }
+    }
+  });
+});
+
+/* checklist persistence */
+document.querySelectorAll('#questions input[type=checkbox]').forEach(function(box){
+  var key = 'robbins-callsheet-' + box.id;
+  try { box.checked = localStorage.getItem(key) === '1'; } catch(e) {}
+  var li = box.closest('li');
+  function sync(){ li.classList.toggle('done', box.checked);
+    try { localStorage.setItem(key, box.checked ? '1' : '0'); } catch(e) {} }
+  box.addEventListener('change', sync); sync();
+});
+})();
 </script>
 
 </body>
